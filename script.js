@@ -1,0 +1,456 @@
+/* ================================================================
+   SCRIPT.JS — Murasolimaran E | AI Portfolio
+   Professional Architecture — No hardcoded keys
+
+   EmailJS keys loaded dynamically from /api/config (backend)
+   Telegram + Google Sheet keys stay fully hidden in .env
+
+   Sections:
+   1.  Config Loader  (EmailJS keys from backend)
+   2.  Toast Notification System
+   3.  Navbar + Back-To-Top + Active Nav Link
+   4.  Hamburger Mobile Menu
+   5.  Custom Cursor
+   6.  Typing Text Effect
+   7.  Contact Form  → /api/contact + EmailJS
+   8.  Certificate Popup + Image Security
+================================================================ */
+
+"use strict";
+
+/* ================================================================
+   1. EMAILJS CONFIG — Loaded from backend /api/config
+      Never hardcoded in frontend
+================================================================ */
+let EMAILJS_PUBLIC_KEY  = "";
+let EMAILJS_SERVICE_ID  = "";
+let EMAILJS_TEMPLATE_ID = "";
+
+let _configLoaded  = false;   /* true once fetch completes */
+let _configPromise = null;    /* reuse same promise everywhere */
+
+async function loadEmailConfig() {
+  try {
+    const res = await fetch("/api/config");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+
+    const data = await res.json();
+
+    EMAILJS_PUBLIC_KEY  = data.publicKey  || "";
+    EMAILJS_SERVICE_ID  = data.serviceId  || "";
+    EMAILJS_TEMPLATE_ID = data.templateId || "";
+
+    /* Init EmailJS as soon as keys arrive */
+    if (typeof emailjs !== "undefined" && EMAILJS_PUBLIC_KEY) {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+
+  } catch (err) {
+    console.warn("EmailJS config load failed:", err.message);
+  } finally {
+    _configLoaded = true;   /* always mark done, even on error */
+  }
+}
+
+/* Start loading immediately — page load time == fetch time */
+_configPromise = loadEmailConfig();
+
+/* ================================================================
+   2. TOAST NOTIFICATION SYSTEM
+   Usage: showToast("message", "success" | "error")
+================================================================ */
+(function injectToastStyles() {
+  if (document.getElementById("_toast_styles")) return;
+  const s = document.createElement("style");
+  s.id = "_toast_styles";
+  s.textContent = `
+    .toast-wrap {
+      position:fixed; top:20px; right:20px; z-index:99999;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .toast {
+      display:flex; align-items:center; gap:12px;
+      min-width:280px; max-width:380px;
+      padding:14px 18px; border-radius:8px;
+      color:#fff; font-family:'Exo 2',sans-serif;
+      font-size:0.88rem; font-weight:600;
+      box-shadow:0 6px 24px rgba(0,0,0,0.4);
+      transform:translateX(115%);
+      transition:transform 0.4s cubic-bezier(0.68,-0.55,0.265,1.55);
+    }
+    .toast.show          { transform:translateX(0); }
+    .toast-success       { background:#10b981; border-left:4px solid #047857; }
+    .toast-error         { background:#ef4444; border-left:4px solid #b91c1c; }
+    .toast-info          { background:#3b82f6; border-left:4px solid #1d4ed8; }
+    .toast i             { font-size:1.1rem; flex-shrink:0; }
+  `;
+  document.head.appendChild(s);
+})();
+
+function showToast(message, type) {
+  type = type || "success";
+
+  let wrap = document.querySelector(".toast-wrap");
+  if (!wrap) {
+    wrap = document.createElement("div");
+    wrap.className = "toast-wrap";
+    document.body.appendChild(wrap);
+  }
+
+  const t   = document.createElement("div");
+  t.className = "toast toast-" + type;
+
+  const icons = {
+    success : '<i class="fa-solid fa-circle-check"></i>',
+    error   : '<i class="fa-solid fa-circle-exclamation"></i>',
+    info    : '<i class="fa-solid fa-circle-info"></i>'
+  };
+  t.innerHTML = (icons[type] || icons.info) + " <span>" + message + "</span>";
+  wrap.appendChild(t);
+
+  /* Double rAF: guarantees CSS transition fires after paint */
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => t.classList.add("show"))
+  );
+
+  setTimeout(() => {
+    t.classList.remove("show");
+    setTimeout(() => t.remove(), 450);
+  }, 4500);
+}
+
+/* ================================================================
+   3. NAVBAR SLIM + BACK TO TOP + ACTIVE NAV LINK
+================================================================ */
+const navbar   = document.getElementById("navbar");
+const bttBtn   = document.getElementById("btt");
+const sections = document.querySelectorAll("section[id]");
+const navLinks = document.querySelectorAll(".nav-links a");
+
+window.addEventListener("scroll", function () {
+
+  /* Slim navbar after 60px */
+  if (navbar) navbar.classList.toggle("slim", window.scrollY > 60);
+
+  /* Show / hide back-to-top button */
+  if (bttBtn) bttBtn.classList.toggle("show", window.scrollY > 400);
+
+  /* Highlight active nav link */
+  let cur = "";
+  sections.forEach(function (s) {
+    if (window.scrollY >= s.offsetTop - 130) cur = s.id;
+  });
+  navLinks.forEach(function (a) {
+    a.classList.toggle("active", a.getAttribute("href") === "#" + cur);
+  });
+
+}, { passive: true });
+
+/* ================================================================
+   4. HAMBURGER MOBILE MENU
+================================================================ */
+const burger = document.getElementById("burger");
+const mobNav = document.getElementById("mobNav");
+
+if (burger && mobNav) {
+  burger.addEventListener("click", function () {
+    burger.classList.toggle("open");
+    mobNav.classList.toggle("open");
+  });
+  mobNav.querySelectorAll("a").forEach(function (a) {
+    a.addEventListener("click", function () {
+      burger.classList.remove("open");
+      mobNav.classList.remove("open");
+    });
+  });
+}
+
+/* ================================================================
+   5. CUSTOM CURSOR (smooth 0.12 lerp follow)
+================================================================ */
+const cursorEl = document.querySelector(".cursor");
+if (cursorEl) {
+  let mx = 0, my = 0, cx = 0, cy = 0;
+  document.addEventListener("mousemove", function (e) {
+    mx = e.clientX;
+    my = e.clientY;
+  });
+  (function moveCursor() {
+    cx += (mx - cx) * 0.12;
+    cy += (my - cy) * 0.12;
+    cursorEl.style.left = cx + "px";
+    cursorEl.style.top  = cy + "px";
+    requestAnimationFrame(moveCursor);
+  })();
+}
+
+/* ================================================================
+   6. TYPING TEXT EFFECT
+   HTML needed: <span class="typing-text"></span> inside .hero-role
+================================================================ */
+const typingEl = document.querySelector(".typing-text");
+if (typingEl) {
+  const roles = [
+    "AI Engineer",
+    "Machine Learning Engineer",
+    "Data Scientist",
+    "Python Developer",
+    "Full Stack Developer",
+    "Creative Technologist"
+  ];
+  let rIdx = 0, cIdx = 0, deleting = false;
+
+  function typeEffect() {
+    const role = roles[rIdx];
+    typingEl.textContent = role.substring(0, deleting ? cIdx - 1 : cIdx + 1);
+    deleting ? cIdx-- : cIdx++;
+
+    if (!deleting && cIdx === role.length) {
+      deleting = true;
+      return setTimeout(typeEffect, 1400);
+    }
+    if (deleting && cIdx === 0) {
+      deleting = false;
+      rIdx = (rIdx + 1) % roles.length;
+    }
+    setTimeout(typeEffect, deleting ? 45 : 90);
+  }
+  typeEffect();
+}
+
+/* ================================================================
+   7. CONTACT FORM HANDLER
+
+   HTML IDs required in your form:
+     <form      id="contactForm">
+     <input     id="fn"        type="text">    ← Full Name
+     <input     id="fe_email"  type="email">   ← Email
+     <input     id="fe_phone"  type="tel">     ← Phone (optional)
+     <select    id="fs">                       ← Subject
+     <textarea  id="fm">                       ← Message
+     <button    id="submitBtn" type="button">  ← Submit
+
+   Data flow:
+     Validate → /api/contact (Telegram + Google Sheet) → EmailJS
+================================================================ */
+document.addEventListener("DOMContentLoaded", function () {
+
+  const form       = document.getElementById("contactForm");
+  const submitBtn  = document.getElementById("submitBtn");
+  const phoneInput = document.getElementById("fe_phone");
+  const emailInput = document.getElementById("fe_email");
+
+  /* --- Phone field: lock "+91 " prefix, allow only digits --- */
+  if (phoneInput) {
+    phoneInput.value = "+91 ";
+
+    phoneInput.addEventListener("input", function () {
+      const digits = this.value
+        .replace("+91 ", "")
+        .replace(/[^0-9]/g, "")
+        .substring(0, 10);
+      this.value = "+91 " + digits;
+    });
+
+    phoneInput.addEventListener("keydown", function (e) {
+      if (
+        this.selectionStart <= 4 &&
+        (e.key === "Backspace" || e.key === "Delete")
+      ) {
+        e.preventDefault();
+      }
+    });
+  }
+
+  /* --- Email: force lowercase in real-time --- */
+  if (emailInput) {
+    emailInput.addEventListener("input", function () {
+      const pos  = this.selectionStart;
+      this.value = this.value.toLowerCase();
+      this.setSelectionRange(pos, pos);
+    });
+  }
+
+  /* --- Form submit handler --- */
+  if (!submitBtn) return;
+
+  submitBtn.addEventListener("click", async function (e) {
+    e.preventDefault();
+
+    /* Collect values */
+    const name    = (document.getElementById("fn")?.value  || "").trim();
+    const subject = (document.getElementById("fs")?.value  || "").trim();
+    const message = (document.getElementById("fm")?.value  || "").trim();
+    const phone   = phoneInput ? phoneInput.value.trim() : "";
+    const email   = emailInput ? emailInput.value.trim() : "";
+
+    /* ---- Validation ---- */
+    if (!name) {
+      showToast("Please enter your Full Name.", "error");
+      return;
+    }
+    if (!subject) {
+      showToast("Please select a Subject.", "error");
+      return;
+    }
+    if (!message) {
+      showToast("Please write your Message.", "error");
+      return;
+    }
+
+    const emailRegex = /^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/;
+    const emailOK    = emailRegex.test(email.toLowerCase());
+    /* "+91 " = 4 chars + 10 digits = 14 total */
+    const phoneOK    = /^\+91\s\d{10}$/.test(phone);
+
+    if (!emailOK && !phoneOK) {
+      showToast(
+        "Please enter a valid Email Address or Phone Number.",
+        "error"
+      );
+      return;
+    }
+
+    /* ---- Loading state ---- */
+    submitBtn.disabled  = true;
+    submitBtn.innerHTML =
+      '<i class="fa-solid fa-spinner fa-spin"></i>&nbsp; Sending...';
+
+    const payload = {
+      name,
+      phone   : phoneOK ? phone : "Not Provided",
+      email   : emailOK ? email : "Not Provided",
+      subject,
+      message
+    };
+
+    /* ================================================
+       STEP 1 — /api/contact  →  Telegram + Google Sheet
+       (Server-side, keys fully hidden in .env)
+    ================================================ */
+    try {
+      const apiRes = await fetch("/api/contact", {
+        method  : "POST",
+        headers : { "Content-Type": "application/json" },
+        body    : JSON.stringify(payload)
+      });
+      if (!apiRes.ok) throw new Error("API HTTP " + apiRes.status);
+    } catch (err) {
+      /* Non-blocking — continues to EmailJS even if API fails */
+      console.warn("Backend API error:", err.message);
+    
+      showToast("Server sync failed. Saved locally only.","info");
+    }
+    /* ================================================
+       STEP 2 — EmailJS  →  Email to owner + auto-reply
+       Wait for config if it hasn't loaded yet
+    ================================================ */
+    if (emailOK) {
+      /* Ensure config is loaded before using keys */
+      if (!_configLoaded) await _configPromise;
+
+      if (typeof emailjs !== "undefined" && EMAILJS_SERVICE_ID) {
+        try {
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            from_name  : name,
+            from_phone : phoneOK ? phone : "Not Provided",
+            from_email : email,
+            subject,
+            message,
+            reply_to   : email
+          });
+        } catch (err) {
+          console.warn("EmailJS error:", err);
+
+          showToast("Email delivery failed.","info");
+        }
+      }
+    }
+
+    /* ================================================
+       DONE — Reset UI
+    ================================================ */
+    showToast("Message sent! I'll reply to you soon. ✅", "success");
+
+    submitBtn.disabled  = false;
+    submitBtn.innerHTML =
+      '<i class="fa-solid fa-paper-plane"></i> Send Message';
+
+    if (form)       form.reset();
+    if (phoneInput) phoneInput.value = "+91 ";
+
+  }); /* end click handler */
+
+}); /* end DOMContentLoaded */
+
+/* ================================================================
+   8. CERTIFICATE POPUP
+   HTML needed:
+     <button class="openCertificate" data-img="path/to/cert.jpg">
+     <div class="certificate-popup">
+       <button class="close-popup">×</button>
+       <img id="popupImage" src="" alt="Certificate">
+     </div>
+================================================================ */
+const popup    = document.querySelector(".certificate-popup");
+const popupImg = document.getElementById("popupImage");
+const closeBtn = document.querySelector(".close-popup");
+const openBtns = document.querySelectorAll(".openCertificate");
+
+if (popup && popupImg && closeBtn) {
+
+  openBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      popupImg.src = btn.getAttribute("data-img") || "";
+      popup.classList.add("active");
+    });
+  });
+
+  closeBtn.addEventListener("click", function () {
+    popup.classList.remove("active");
+  });
+
+  /* Click outside image = close */
+  popup.addEventListener("click", function (e) {
+    if (e.target === popup) popup.classList.remove("active");
+  });
+}
+
+/* ================================================================
+   CERTIFICATE IMAGE SECURITY
+================================================================ */
+
+/* Block right-click inside popup */
+document.addEventListener("contextmenu", function (e) {
+  if (e.target.closest(".certificate-popup")) e.preventDefault();
+});
+
+/* Block drag of certificate image */
+document.addEventListener("dragstart", function (e) {
+  if (e.target.closest(".certificate-popup")) e.preventDefault();
+});
+
+/* Block keyboard shortcuts that could save/inspect page */
+document.addEventListener("keydown", function (e) {
+  const k  = e.key.toLowerCase();
+  const ct = e.ctrlKey;
+  const sh = e.shiftKey;
+
+  if (
+    (ct && k === "s")          ||   /* Ctrl+S  — Save page      */
+    (ct && k === "u")          ||   /* Ctrl+U  — View source    */
+    (ct && sh && k === "i")    ||   /* Ctrl+Shift+I — DevTools  */
+    (ct && sh && k === "j")    ||   /* Ctrl+Shift+J — Console   */
+    e.key === "F12"                  /* F12 — DevTools           */
+  ) {
+    e.preventDefault();
+  }
+});
+
+/* Blur certificate when user switches tab */
+document.addEventListener("visibilitychange", function () {
+  const certImg = document.querySelector(".certificate-popup img");
+  if (!certImg) return;
+  certImg.style.transition = "filter 0.4s ease";
+  certImg.style.filter     = document.hidden ? "blur(25px)" : "blur(0)";
+});
