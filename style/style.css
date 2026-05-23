@@ -220,7 +220,7 @@ body{
   position:relative;
   overflow:hidden;
   background:var(--bg);
-  background-image: url('/Maran_portfolio/assert/project_image/shadow_blue.jpeg');
+  background-image: url('assert/project_image/shadow_blue.jpeg');
 
   /* Indha 3 lines dynamic-a fit panni tharum */
   background-size: cover;      /* Screen full-a fill aagum, cut aagaadhu */
