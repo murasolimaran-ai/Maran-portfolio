@@ -1,0 +1,21 @@
+{
+  "version": 2,
+
+  "routes": [
+
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+
+    {
+      "handle": "filesystem"
+    },
+
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+
+  ]
+}
