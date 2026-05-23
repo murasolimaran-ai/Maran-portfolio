@@ -18,6 +18,7 @@ export default function handler(req, res) {
   return res.status(200).json({
     publicKey  : process.env.EMAILJS_PUBLIC_KEY  || "",
     serviceId  : process.env.EMAILJS_SERVICE_ID  || "",
-    templateId : process.env.EMAILJS_TEMPLATE_ID || ""
+    templateId : process.env.EMAILJS_TEMPLATE_ID || "",
+    autoReplyTemplateId:process.env.EMAILJS_AUTOREPLY_TEMPLATE_ID || ""
   });
 }

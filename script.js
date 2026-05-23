@@ -25,6 +25,7 @@
 let EMAILJS_PUBLIC_KEY  = "";
 let EMAILJS_SERVICE_ID  = "";
 let EMAILJS_TEMPLATE_ID = "";
+let EMAILJS_AUTOREPLY_TEMPLATE_ID = "";
 
 let _configLoaded  = false;   /* true once fetch completes */
 let _configPromise = null;    /* reuse same promise everywhere */
@@ -39,6 +40,7 @@ async function loadEmailConfig() {
     EMAILJS_PUBLIC_KEY  = data.publicKey  || "";
     EMAILJS_SERVICE_ID  = data.serviceId  || "";
     EMAILJS_TEMPLATE_ID = data.templateId || "";
+    EMAILJS_AUTOREPLY_TEMPLATE_ID =data.autoReplyTemplateId || "";
 
     /* Init EmailJS as soon as keys arrive */
     if (typeof emailjs !== "undefined" && EMAILJS_PUBLIC_KEY) {
@@ -351,6 +353,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (typeof emailjs !== "undefined" && EMAILJS_SERVICE_ID) {
         try {
+        /* =================================
+         1. OWNER EMAIL
+        ================================= */
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
             from_name  : name,
             from_phone : phoneOK ? phone : "Not Provided",
@@ -359,11 +364,28 @@ document.addEventListener("DOMContentLoaded", function () {
             message,
             reply_to   : email
           });
+           /* =================================
+             2. USER AUTO REPLY
+           ================================= */
+
+           await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_AUTOREPLY_TEMPLATE_ID,{
+          from_name  : name,
+          from_phone : phoneOK ? phone : "Not Provided",
+          from_email : email,
+          subject,
+          message,
+          reply_to : email
+
+        }
+
+      );
         } catch (err) {
           console.warn("EmailJS error:", err);
 
           showToast("Email delivery failed.","info");
         }
+
+
       }
     }
 
