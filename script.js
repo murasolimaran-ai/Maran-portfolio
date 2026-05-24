@@ -476,3 +476,29 @@ document.addEventListener("visibilitychange", function () {
   certImg.style.transition = "filter 0.4s ease";
   certImg.style.filter     = document.hidden ? "blur(25px)" : "blur(0)";
 });
+/* 1. Mobile PrintScreen / Screenshot app open panna image hide panna */
+window.addEventListener("keyup", function (e) {
+  if (e.key === "PrintScreen") {
+    navigator.clipboard.writeText(""); // Clipboard clear aagum
+    alert("Screenshots are disabled for security!");
+  }
+});
+
+/* 2. DevTools open panni src code paatha popup-a automatic-ah close panna */
+setInterval(function() {
+  const before = new Date().getTime();
+  debugger; // DevTools open-ah iruntha intha idathula code pause aagum
+  const after = new Date().getTime();
+  if (after - before > 100) {
+    // DevTools open aagi iruku nu artham, so popup-a close panrom
+    const popup = document.querySelector(".certificate-popup");
+    if(popup) popup.classList.remove("active");
+  }
+}, 1000);
+
+/* 3. Mobile touch-hold panni download panna mudiyaama thaduka */
+document.addEventListener("touchstart", function(e) {
+  if (e.target.closest(".certificate-popup img")) {
+    e.preventDefault();
+  }
+}, { passive: false });
