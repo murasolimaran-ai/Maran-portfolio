@@ -34,17 +34,19 @@ export default async function handler(req, res) {
     /* ============================================================
        1. TELEGRAM BOT
     ============================================================ */
-    const telegramText =
+const telegramText =
 `🚀 *New Portfolio Lead*
 
-👤 *Name:*    ${name}
-📱 *Phone:*   ${phone   || "Not Provided"}
-📧 *Email:*   ${email   || "Not Provided"}
-📌 *Subject:* ${subject}
-🕒 *Time:*    ${timestamp} IST
+\`👤 Name:    ${name.padEnd(20, ' ')}\`
+\`📱 Phone:   ${(phone || "Not Provided").padEnd(20, ' ')}\`
+\`📧 Email:   ${(email || "Not Provided").padEnd(20, ' ')}\`
+\`📌 Subject: ${subject.padEnd(20, ' ')}\`
+\`🕒 Time:    ${(timestamp + " IST").padEnd(20, ' ')}\`
 
 💬 *Message:*
-${message}`;
+\`\`\`
+${message}
+\`\`\``;
 
     await fetch(
       `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
