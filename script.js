@@ -187,6 +187,135 @@ if (cursorEl) {
 }
 
 /* ================================================================
+   5A. PROFILE HUD PARALLAX — decorative, lightweight, motion-safe
+================================================================ */
+const profileHud = document.getElementById("profileHud");
+const reduceHudMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+if (profileHud && !reduceHudMotion.matches) {
+  let hudFrame = 0;
+  let hudX = 0;
+  let hudY = 0;
+
+  profileHud.addEventListener("pointermove", function (e) {
+    const rect = profileHud.getBoundingClientRect();
+    hudX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    hudY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
+    if (hudFrame) return;
+    hudFrame = requestAnimationFrame(function () {
+      profileHud.style.setProperty("--hud-outer-x", (hudX * 5).toFixed(2) + "px");
+      profileHud.style.setProperty("--hud-outer-y", (hudY * 5).toFixed(2) + "px");
+      profileHud.style.setProperty("--hud-inner-x", (hudX * 2.5).toFixed(2) + "px");
+      profileHud.style.setProperty("--hud-inner-y", (hudY * 2.5).toFixed(2) + "px");
+      hudFrame = 0;
+    });
+  });
+
+  profileHud.addEventListener("pointerleave", function () {
+    profileHud.style.setProperty("--hud-outer-x", "0px");
+    profileHud.style.setProperty("--hud-outer-y", "0px");
+    profileHud.style.setProperty("--hud-inner-x", "0px");
+    profileHud.style.setProperty("--hud-inner-y", "0px");
+  });
+}
+
+/* ================================================================
+   5B. ABOUT PORTRAIT PARALLAX — decorative and motion-safe
+================================================================ */
+const aboutPortrait = document.getElementById("aboutPortrait");
+
+if (aboutPortrait && !reduceHudMotion.matches) {
+  let aboutFrame = 0;
+  let aboutX = 0;
+  let aboutY = 0;
+
+  aboutPortrait.addEventListener("pointermove", function (e) {
+    const rect = aboutPortrait.getBoundingClientRect();
+    aboutX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    aboutY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
+    if (aboutFrame) return;
+    aboutFrame = requestAnimationFrame(function () {
+      aboutPortrait.style.setProperty("--about-back-x", (aboutX * 6).toFixed(2) + "px");
+      aboutPortrait.style.setProperty("--about-back-y", (aboutY * 6).toFixed(2) + "px");
+      aboutPortrait.style.setProperty("--about-ribbon-x", (aboutX * 8).toFixed(2) + "px");
+      aboutPortrait.style.setProperty("--about-ribbon-y", (aboutY * 8).toFixed(2) + "px");
+      aboutPortrait.style.setProperty("--about-photo-x", (aboutX * 2).toFixed(2) + "px");
+      aboutPortrait.style.setProperty("--about-photo-y", (aboutY * 2).toFixed(2) + "px");
+      aboutFrame = 0;
+    });
+  });
+
+  aboutPortrait.addEventListener("pointerleave", function () {
+    ["back", "ribbon", "photo"].forEach(function (layer) {
+      aboutPortrait.style.setProperty("--about-" + layer + "-x", "0px");
+      aboutPortrait.style.setProperty("--about-" + layer + "-y", "0px");
+    });
+  });
+}
+
+/* ================================================================
+   5C. BEYOND CODE ENTRANCE — one-time, lightweight reveal
+================================================================ */
+const beyondCards = document.querySelectorAll(".beyond-card");
+
+if (beyondCards.length) {
+  if (reduceHudMotion.matches || !("IntersectionObserver" in window)) {
+    beyondCards.forEach(function (card) { card.classList.add("reveal"); });
+  } else {
+    const beyondObserver = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("reveal");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.15 });
+    beyondCards.forEach(function (card) { beyondObserver.observe(card); });
+  }
+}
+const revealElements = document.querySelectorAll(".reveal");
+
+if (revealElements.length) {
+  if (
+    typeof reduceHudMotion !== "undefined" &&
+    reduceHudMotion.matches
+  ) {
+    revealElements.forEach(el => {
+      el.classList.add("reveal-active");
+    });
+  } else if ("IntersectionObserver" in window) {
+
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+
+        entries.forEach(entry => {
+
+          if (!entry.isIntersecting) return;
+
+          entry.target.classList.add("reveal-active");
+
+          observer.unobserve(entry.target);
+        });
+
+      },
+      {
+        threshold: 0.15
+      }
+    );
+
+    revealElements.forEach(el => {
+      revealObserver.observe(el);
+    });
+
+  } else {
+    revealElements.forEach(el => {
+      el.classList.add("reveal-active");
+    });
+  }
+}
+
+/* ================================================================
    6. TYPING TEXT EFFECT
    HTML needed: <span class="typing-text"></span> inside .hero-role
 ================================================================ */
@@ -439,66 +568,75 @@ if (popup && popupImg && closeBtn) {
 }
 
 /* ================================================================
-   CERTIFICATE IMAGE SECURITY
+   SITE CONFIG — Centralized Personal / Social / Asset Details
 ================================================================ */
 
-/* Block right-click inside popup */
-document.addEventListener("contextmenu", function (e) {
-  if (e.target.closest(".certificate-popup")) e.preventDefault();
+function loadSiteConfig() {
+
+  /* Profile details */
+  
+  document.querySelectorAll('[data-social="email"]').forEach(el => {
+  el.href = `mailto:${SITE_CONFIG.profile.email}`;
+  });
+
+  document.querySelectorAll('[data-site="phone"]').forEach(el => {
+    el.textContent = SITE_CONFIG.profile.phone;
+
+    if (el.tagName === "A") {
+      el.href = `tel:${SITE_CONFIG.profile.phone.replace(/\s+/g, "")}`;
+    }
+  });
+
+
+
+  /* Social links */
+  document.querySelectorAll('[data-social="greybox"]').forEach(el => {
+    el.href = SITE_CONFIG.social.greybox;
+  });
+
+  document.querySelectorAll('[data-social="book"]').forEach(el => {
+    el.href = SITE_CONFIG.social.book;
+  });
+
+  document.querySelectorAll('[data-social="github"]').forEach(el => {
+    el.href = SITE_CONFIG.social.github;
+  });
+
+  document.querySelectorAll('[data-social="linkedin"]').forEach(el => {
+    el.href = SITE_CONFIG.social.linkedin;
+  });
+
+  document.querySelectorAll('[data-social="youtube"]').forEach(el => {
+    el.href = SITE_CONFIG.social.youtube;
+  });
+
+  document.querySelectorAll('[data-social="instagram"]').forEach(el => {
+    el.href = SITE_CONFIG.social.instagram;
+  });
+
+
+  /* Images */
+  document.querySelectorAll('[data-image="profile"]').forEach(el => {
+  el.src = SITE_CONFIG.links.profile_image;
 });
 
-/* Block drag of certificate image */
-document.addEventListener("dragstart", function (e) {
-  if (e.target.closest(".certificate-popup")) e.preventDefault();
+document.querySelectorAll('[data-image="about"]').forEach(el => {
+  el.src = SITE_CONFIG.links.about_image;
 });
 
-/* Block keyboard shortcuts that could save/inspect page */
-document.addEventListener("keydown", function (e) {
-  const k  = e.key.toLowerCase();
-  const ct = e.ctrlKey;
-  const sh = e.shiftKey;
-
-  if (
-    (ct && k === "s")          ||   /* Ctrl+S  — Save page      */
-    (ct && k === "u")          ||   /* Ctrl+U  — View source    */
-    (ct && sh && k === "i")    ||   /* Ctrl+Shift+I — DevTools  */
-    (ct && sh && k === "j")    ||   /* Ctrl+Shift+J — Console   */
-    e.key === "F12"                  /* F12 — DevTools           */
-  ) {
-    e.preventDefault();
-  }
+document.querySelectorAll('[data-image="greybox-logo"]').forEach(el => {
+  el.src = SITE_CONFIG.links.greybox_logo;
 });
 
-/* Blur certificate when user switches tab */
-document.addEventListener("visibilitychange", function () {
-  const certImg = document.querySelector(".certificate-popup img");
-  if (!certImg) return;
-  certImg.style.transition = "filter 0.4s ease";
-  certImg.style.filter     = document.hidden ? "blur(25px)" : "blur(0)";
-});
-/* 1. Mobile PrintScreen / Screenshot app open panna image hide panna */
-window.addEventListener("keyup", function (e) {
-  if (e.key === "PrintScreen") {
-    navigator.clipboard.writeText(""); // Clipboard clear aagum
-    alert("Screenshots are disabled for security!");
-  }
-});
+/* Resume */
 
-/* 2. DevTools open panni src code paatha popup-a automatic-ah close panna */
-setInterval(function() {
-  const before = new Date().getTime();
-  debugger; // DevTools open-ah iruntha intha idathula code pause aagum
-  const after = new Date().getTime();
-  if (after - before > 100) {
-    // DevTools open aagi iruku nu artham, so popup-a close panrom
-    const popup = document.querySelector(".certificate-popup");
-    if(popup) popup.classList.remove("active");
-  }
-}, 1000);
+document.querySelectorAll('[data-link="resume"]').forEach(el => {
+  el.href = SITE_CONFIG.links.resume;
+});
+}
 
-/* 3. Mobile touch-hold panni download panna mudiyaama thaduka */
-document.addEventListener("touchstart", function(e) {
-  if (e.target.closest(".certificate-popup img")) {
-    e.preventDefault();
-  }
-}, { passive: false });
+
+/* Run after HTML is ready */
+document.addEventListener("DOMContentLoaded", loadSiteConfig);
+
+
