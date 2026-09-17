@@ -12,6 +12,9 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 img,
@@ -452,6 +455,7 @@ body {
 
 }
 
+
 /* Mobile nav */
 .mob-nav {
   display: none;
@@ -688,6 +692,7 @@ body {
 /* Stat counters (inspired by Image 5 Foliar) */
 .hero-stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 2rem;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
@@ -3203,6 +3208,26 @@ body {
   }
 }
 
+/* Keep the 4-per-row skill circles from crowding/overflowing on very
+   narrow phones — shrink first, then drop to 3 columns if still tight. */
+@media (max-width: 400px) {
+  .sk-grid {
+    gap: 0.8rem 0.6rem;
+  }
+
+  .sk-circ {
+    width: 64px;
+    height: 64px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .sk-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 /* Tablet: 481px–768px */
 @media(min-width:481px) and (max-width:768px) {
   .nav-links {
@@ -3407,6 +3432,30 @@ body {
 
   to {
     transform: rotate(360deg);
+  }
+}
+/* =============================================
+   CUSTOM CURSOR - TOUCH DEVICE CONTROL
+   ============================================= */
+
+/* Desktop / Mouse devices
+   → Custom cursor works normally
+*/
+
+/* Mobile / Tablet / Touch devices
+   → Completely disable custom cursor
+*/
+@media (hover: none) and (pointer: coarse) {
+  .cursor {
+    display: none !important;
+  }
+}
+
+/* Extra protection for devices that don't support
+   mouse hover at all */
+@media (pointer: coarse) {
+  .cursor {
+    display: none !important;
   }
 }
 
