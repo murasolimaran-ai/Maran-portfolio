@@ -3282,7 +3282,7 @@ body {
 /* Desktop: ≥1024px */
 @media(min-width:1024px) {
   .hero-wrap {
-    flex-direction: row;
+    flex-direction: row ;
   }
 
   .about-grid {
