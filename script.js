@@ -639,4 +639,388 @@ document.querySelectorAll('[data-link="resume"]').forEach(el => {
 /* Run after HTML is ready */
 document.addEventListener("DOMContentLoaded", loadSiteConfig);
 
+/* ================================================================
+   LOADER — Animated Loading Screen
+================================================================ */
+document.addEventListener("DOMContentLoaded", () => {
 
+  const loader = document.getElementById("app-loader");
+
+  // Already launched before → don't show loader
+  if (localStorage.getItem("mm_portfolio_launched") === "true") {
+    if (loader) loader.remove();
+    return;
+  }
+
+  const percent = document.getElementById("loader-percent");
+  const progress = document.getElementById("loader-progress");
+  const status = document.getElementById("loader-status");
+
+  if (!loader || !percent || !progress) return;
+
+  const statuses = [
+    { value: 0, text: "INITIALIZING..." },
+    { value: 20, text: "LOADING EXPERIENCE..." },
+    { value: 40, text: "BUILDING INTERFACE..." },
+    { value: 60, text: "CONNECTING CREATIVITY..." },
+    { value: 80, text: "ALMOST READY..." },
+    { value: 100, text: "WELCOME." }
+  ];
+
+  const duration = 2600;
+  const startTime = performance.now();
+
+  function animateLoader(currentTime) {
+
+    const elapsed = currentTime - startTime;
+
+    const rawProgress = Math.min(
+      elapsed / duration,
+      1
+    );
+
+    const easedProgress =
+      1 - Math.pow(1 - rawProgress, 3);
+
+    const current = Math.floor(easedProgress * 100);
+
+    percent.textContent = current;
+    progress.style.width = current + "%";
+
+    let currentStatus = statuses[0];
+
+    for (const item of statuses) {
+      if (current >= item.value) {
+        currentStatus = item;
+      }
+    }
+
+    status.textContent = currentStatus.text;
+
+    if (rawProgress < 1) {
+
+      requestAnimationFrame(animateLoader);
+
+    } else {
+
+      setTimeout(() => {
+
+        // Remember that first launch is completed
+        localStorage.setItem(
+          "mm_portfolio_launched",
+          "true"
+        );
+
+        loader.classList.add("loader-hidden");
+
+        setTimeout(() => {
+          loader.remove();
+        }, 900);
+
+      }, 500);
+    }
+  }
+
+  requestAnimationFrame(animateLoader);
+
+});
+/* ================================================================
+   MM PORTFOLIO — FIRST LAUNCH LOADER
+================================================================ */
+
+(function () {
+
+  const LOADER_KEY =
+    "mm_portfolio_first_launch";
+
+  const loader =
+    document.getElementById("app-loader");
+
+
+  /* =========================================
+     ALREADY COMPLETED
+  ========================================= */
+
+  try {
+
+    if (
+      localStorage.getItem(LOADER_KEY) ===
+      "completed"
+    ) {
+
+      if (loader) {
+        loader.remove();
+      }
+
+      return;
+    }
+
+  } catch (error) {
+
+    console.warn(
+      "LocalStorage unavailable:",
+      error
+    );
+
+  }
+
+
+  /* =========================================
+     REQUIRED ELEMENTS
+  ========================================= */
+
+  if (!loader) {
+    return;
+  }
+
+
+  const percent =
+    document.getElementById(
+      "loader-percent"
+    );
+
+  const progress =
+    document.getElementById(
+      "loader-progress"
+    );
+
+  const status =
+    document.getElementById(
+      "loader-status"
+    );
+
+  const progressTrack =
+    document.querySelector(
+      ".progress-track"
+    );
+
+
+  if (
+    !percent ||
+    !progress ||
+    !status
+  ) {
+
+    loader.remove();
+
+    return;
+  }
+
+
+  /* =========================================
+     LOADING STATUS
+  ========================================= */
+
+  const statuses = [
+
+    {
+      value: 0,
+      text: "INITIALIZING..."
+    },
+
+    {
+      value: 20,
+      text: "LOADING EXPERIENCE..."
+    },
+
+    {
+      value: 40,
+      text: "BUILDING INTERFACE..."
+    },
+
+    {
+      value: 60,
+      text: "CONNECTING CREATIVITY..."
+    },
+
+    {
+      value: 80,
+      text: "ALMOST READY..."
+    },
+
+    {
+      value: 100,
+      text: "WELCOME."
+    }
+
+  ];
+
+
+  /* =========================================
+     LOADER SETTINGS
+  ========================================= */
+
+  const duration = 2600;
+
+  const startTime =
+    performance.now();
+
+
+  /* =========================================
+     ANIMATION
+  ========================================= */
+
+  function animateLoader(
+    currentTime
+  ) {
+
+    const elapsed =
+      currentTime - startTime;
+
+
+    const rawProgress =
+      Math.min(
+        elapsed / duration,
+        1
+      );
+
+
+    /*
+     * Smooth ease-out
+     */
+
+    const easedProgress =
+      1 -
+      Math.pow(
+        1 - rawProgress,
+        3
+      );
+
+
+    const current =
+      Math.floor(
+        easedProgress * 100
+      );
+
+
+    /* =====================================
+       UPDATE %
+    ===================================== */
+
+    percent.textContent =
+      current;
+
+
+    /* =====================================
+       UPDATE BAR
+    ===================================== */
+
+    progress.style.width =
+      current + "%";
+
+
+    /* =====================================
+       ACCESSIBILITY
+    ===================================== */
+
+    if (progressTrack) {
+
+      progressTrack.setAttribute(
+        "aria-valuenow",
+        current
+      );
+
+    }
+
+
+    /* =====================================
+       UPDATE STATUS
+    ===================================== */
+
+    let activeStatus =
+      statuses[0];
+
+
+    for (
+      const item of statuses
+    ) {
+
+      if (
+        current >= item.value
+      ) {
+
+        activeStatus = item;
+
+      }
+
+    }
+
+
+    status.textContent =
+      activeStatus.text;
+
+
+    /* =====================================
+       CONTINUE
+    ===================================== */
+
+    if (
+      rawProgress < 1
+    ) {
+
+      requestAnimationFrame(
+        animateLoader
+      );
+
+      return;
+    }
+
+
+    /* =====================================
+       100% COMPLETE
+    ===================================== */
+
+    setTimeout(() => {
+
+
+      /*
+       * Save first-launch completion
+       */
+
+      try {
+
+        localStorage.setItem(
+          LOADER_KEY,
+          "completed"
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "Unable to save loader state:",
+          error
+        );
+
+      }
+
+
+      /*
+       * Fade out
+       */
+
+      loader.classList.add(
+        "loader-hidden"
+      );
+
+
+      /*
+       * Remove after animation
+       */
+
+      setTimeout(() => {
+
+        loader.remove();
+
+      }, 900);
+
+
+    }, 400);
+
+  }
+
+
+  requestAnimationFrame(
+    animateLoader
+  );
+
+})();

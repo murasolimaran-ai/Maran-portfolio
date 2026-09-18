@@ -1,5 +1,5 @@
 {
-  "name": "Murasolimaran E | AI & Full Stack",
+  "name": "Maran Portfolio",
   "short_name": "Murasolimaran",
   "description": "Portfolio of Murasolimaran E, an AI & Full Stack Developer.",
   "start_url": "/",
@@ -12,13 +12,13 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "/assert/project_image/tab_icon.png",
+      "src": "assert/project_image/tab_icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assert/project_image/tab_icon.png",
+      "src": "assert/project_image/tab_icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

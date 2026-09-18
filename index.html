@@ -1021,10 +1021,175 @@ web solutions while working on freelance projects and real-world client solution
   <!-- Back to top -->
   <a href="#home" class="btt" id="btt" title="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
 
+<!-- =========================================
+     PREMIUM MM APP LOADER
+     First Launch Only
+========================================= -->
 
-  <!-- =============================================
-     JAVASCRIPT
-============================================= -->
+<div id="app-loader" aria-hidden="true">
+
+  <div class="loader-scene">
+
+    <!-- Ambient Spotlight -->
+    <div class="loader-spotlight"></div>
+
+    <!-- Light Beams -->
+    <div class="light-beam beam-1"></div>
+    <div class="light-beam beam-2"></div>
+    <div class="light-beam beam-3"></div>
+
+    <!-- =====================================
+         MM LOGO REVEAL
+    ====================================== -->
+
+    <div class="logo-stage">
+
+      <div class="logo-glow"></div>
+
+      <img
+        src="assert/project_image/MM-logo.png"
+        alt="MM"
+        class="loader-logo"
+        width="245"
+        height="245"
+      >
+
+      <!-- Futuristic Platform -->
+      <div class="stage-floor">
+
+        <div class="stage-ring ring-1"></div>
+        <div class="stage-ring ring-2"></div>
+        <div class="stage-ring ring-3"></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================
+         BRAND
+    ====================================== -->
+
+    <div class="loader-brand">
+
+      <h1>MURASOLIMARAN E</h1>
+
+      <p>
+        AI &amp; FULL STACK DEVELOPER
+      </p>
+
+      <span class="brand-line"></span>
+
+    </div>
+
+
+    <!-- =====================================
+         TAGLINE
+    ====================================== -->
+
+    <div class="loader-tagline">
+
+      <span>Better Solutions</span>
+
+      <span>Brighter Tomorrow</span>
+
+    </div>
+
+
+    <!-- =====================================
+         LOADING PROGRESS
+    ====================================== -->
+
+    <div
+      class="loader-progress-area"
+      aria-live="polite"
+    >
+
+      <div class="loader-percentage">
+
+        <span id="loader-percent">0</span>
+        <span>%</span>
+
+      </div>
+
+
+      <div
+        class="progress-track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+
+        <div id="loader-progress"></div>
+
+      </div>
+
+
+      <p id="loader-status">
+        INITIALIZING...
+      </p>
+
+    </div>
+
+
+    <!-- =====================================
+         FOOTER
+    ====================================== -->
+
+    <div class="loader-footer">
+
+      BUILD
+      <span>•</span>
+      LEARN
+      <span>•</span>
+      GROW
+
+    </div>
+
+  </div>
+
+</div>
+<script>
+/* =========================================
+   SERVICE WORKER REGISTRATION
+========================================= */
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener(
+    "load",
+    () => {
+
+      navigator.serviceWorker
+        .register(
+          "/service-worker.js",
+          {
+            scope: "/"
+          }
+        )
+        .then((registration) => {
+
+          console.log(
+            "PWA Service Worker registered:",
+            registration.scope
+          );
+
+        })
+        .catch((error) => {
+
+          console.error(
+            "Service Worker registration failed:",
+            error
+          );
+
+        });
+
+    }
+  );
+
+}
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <!-- C:\Users\Murasolimaran\OneDrive\Desktop\Right_Click\Maran_portfolio\script.js -->
