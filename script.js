@@ -632,6 +632,7 @@ document.querySelectorAll('[data-image="greybox-logo"]').forEach(el => {
 
 document.querySelectorAll('[data-link="resume"]').forEach(el => {
   el.href = SITE_CONFIG.links.resume;
+  el.download = "Murasolimaran_Resume.pdf";
 });
 }
 

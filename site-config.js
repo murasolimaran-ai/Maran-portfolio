@@ -18,7 +18,7 @@ const SITE_CONFIG = {
 
     profile_image: "assert/project_image/maran_profile.png",
     about_image: "assert/project_image/maran_about.png",
-    resume: "assert/pdf_resume/Resume_Murasolimaran.pdf",
+    resume: "assert/Resume_Murasolimaran.pdf",
     greybox_logo: "assert/project_image/greybox_logo.jpeg"
   }
 };
