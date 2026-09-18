@@ -7492,13 +7492,14 @@ select:focus-visible {
 
   padding: 18px;
 
-  border-radius: 18px;
+  border-radius: 25px;
 
-  background:
-    rgba(9, 11, 15, 0.97);
+ background: rgba(9, 11, 15, 0.78);
+backdrop-filter: blur(22px);
+-webkit-backdrop-filter: blur(22px);
 
   border:
-    1px solid
+    3px solid
     rgba(255, 255, 255, 0.10);
 
   box-shadow:
@@ -8029,7 +8030,7 @@ select:focus-visible {
 
     padding: 16px;
 
-    border-radius: 16px;
+    border-radius: 25px;
 
   }
 
