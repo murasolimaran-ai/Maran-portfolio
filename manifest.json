@@ -1,6 +1,7 @@
 {
+  "id": "/",
   "name": "Welcome to Maran Portfolio",
-  "short_name": "Maran Portfolio",
+  "short_name": "Murasolimaran",
   "description": "Welcome to the official portfolio of Murasolimaran E — AI & Full Stack Developer.",
   "start_url": "/",
   "scope": "/",
