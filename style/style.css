@@ -8271,3 +8271,14 @@ and (
   }
 
 }
+.network-widget.online .network-card {
+  border-color: rgba(5, 78, 32, 0.688);
+}
+
+.network-widget.offline .network-card {
+  border-color: rgba(220, 5, 5, 0.57);
+}
+
+.network-widget.checking .network-card {
+  border-color: rgba(68, 146, 242, 0.4);
+}
