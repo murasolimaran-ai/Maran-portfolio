@@ -1,27 +1,63 @@
 {
-  "name": "Maran Portfolio",
-  "short_name": "Murasolimaran",
-  "description": "Portfolio of Murasolimaran E, an AI & Full Stack Developer.",
+  "name": "Welcome to Maran Portfolio",
+  "short_name": "Maran Portfolio",
+  "description": "Welcome to the official portfolio of Murasolimaran E — AI & Full Stack Developer.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+
+  "background_color": "#080808",
+  "theme_color": "#FF6A00",
+
   "lang": "en-IN",
   "dir": "ltr",
+
+  "categories": [
+    "portfolio",
+    "business",
+    "productivity"
+  ],
+
   "icons": [
     {
-      "src": "assert/project_image/tab_icon.png",
+      "src": "assert/project_image/tab_icon_app.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assert/project_image/tab_icon.png",
+      "src": "assert/project_image/tab_logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Home",
+      "short_name": "Home",
+      "description": "Open Maran Portfolio home page",
+      "url": "/"
+    },
+    {
+      "name": "About",
+      "short_name": "About",
+      "description": "Learn more about Maran",
+      "url": "/about"
+    },
+    {
+      "name": "Projects",
+      "short_name": "Projects",
+      "description": "Explore Maran's projects",
+      "url": "/projects"
+    },
+    {
+      "name": "Contact",
+      "short_name": "Contact",
+      "description": "Contact Maran",
+      "url": "/contact"
     }
   ]
 }
