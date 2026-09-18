@@ -1291,7 +1291,7 @@ document.addEventListener("DOMContentLoaded", () => {
         closeCard();
 
       },
-      5000
+      3000
     );
 
   }
