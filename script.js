@@ -1024,3 +1024,459 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
 })();
+/* ================================================================
+   FLOATING NETWORK STATUS
+   Murasolimaran Portfolio PWA
+================================================================ */
+
+(function () {
+
+  const widget =
+    document.getElementById("network-widget");
+
+  const badge =
+    document.getElementById("network-badge");
+
+  const closeButton =
+    document.getElementById("network-close");
+
+  const title =
+    document.getElementById("network-title");
+
+  const subtitle =
+    document.getElementById("network-subtitle");
+
+  const connection =
+    document.getElementById("network-connection");
+
+  const network =
+    document.getElementById("network-network");
+
+  const footer =
+    document.getElementById("network-footer");
+
+
+  if (
+    !widget ||
+    !badge ||
+    !closeButton
+  ) {
+    return;
+  }
+
+
+  let hideTimer = null;
+
+
+  /* ================================================================
+     SHOW WIDGET
+  ================================================================ */
+
+  function showWidget() {
+
+    widget.classList.add("widget-visible");
+
+  }
+
+
+  /* ================================================================
+     HIDE ENTIRE WIDGET
+  ================================================================ */
+
+  function hideWidget() {
+
+    widget.classList.remove(
+      "widget-visible",
+      "card-open"
+    );
+
+    badge.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+  }
+
+
+  /* ================================================================
+     OPEN CARD
+  ================================================================ */
+
+  function openCard() {
+
+    widget.classList.add(
+      "widget-visible",
+      "card-open"
+    );
+
+    badge.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+  }
+
+
+  /* ================================================================
+     CLOSE CARD ONLY
+  ================================================================ */
+
+  function closeCard() {
+
+    widget.classList.remove(
+      "card-open"
+    );
+
+    badge.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+  }
+
+
+  /* ================================================================
+     AUTO HIDE
+  ================================================================ */
+
+  function hideAfterTwoSeconds() {
+
+    clearTimeout(hideTimer);
+
+    hideTimer = setTimeout(() => {
+
+      hideWidget();
+
+    }, 2000);
+
+  }
+
+
+  /* ================================================================
+     ONLINE UI
+  ================================================================ */
+
+  function showOnline() {
+
+    widget.classList.remove(
+      "offline",
+      "checking"
+    );
+
+    widget.classList.add(
+      "online"
+    );
+
+
+    title.textContent =
+      "You're Online";
+
+    subtitle.textContent =
+      "Internet connection available";
+
+    connection.textContent =
+      "ONLINE";
+
+    network.textContent =
+      "Active";
+
+    footer.textContent =
+      "All features available";
+
+
+    /*
+     * Show card + badge
+     */
+
+    openCard();
+
+
+    /*
+     * IMPORTANT:
+     * Entire widget disappears after 2 seconds.
+     */
+
+    hideAfterTwoSeconds();
+
+  }
+
+
+  /* ================================================================
+     OFFLINE UI
+  ================================================================ */
+
+  function showOffline() {
+
+    clearTimeout(hideTimer);
+
+
+    widget.classList.remove(
+      "online",
+      "checking"
+    );
+
+    widget.classList.add(
+      "offline"
+    );
+
+
+    title.textContent =
+      "You're Offline";
+
+    subtitle.textContent =
+      "No internet connection";
+
+    connection.textContent =
+      "OFFLINE";
+
+    network.textContent =
+      "Disconnected";
+
+    footer.textContent =
+      "Waiting for internet connection";
+
+
+    /*
+     * IMPORTANT:
+     * Offline card NEVER auto closes.
+     */
+
+    openCard();
+
+  }
+
+
+  /* ================================================================
+     CHECKING
+  ================================================================ */
+
+  function showChecking() {
+
+    widget.classList.remove(
+      "online",
+      "offline"
+    );
+
+    widget.classList.add(
+      "checking"
+    );
+
+
+    title.textContent =
+      "Checking Connection";
+
+    subtitle.textContent =
+      "Checking internet access...";
+
+    connection.textContent =
+      "CHECKING";
+
+    network.textContent =
+      "Please wait";
+
+    footer.textContent =
+      "Checking network status";
+
+
+    openCard();
+
+  }
+
+
+  /* ================================================================
+     INITIAL APP LOAD
+  ================================================================ */
+
+  showChecking();
+
+
+  setTimeout(() => {
+
+    if (navigator.onLine) {
+
+      showOnline();
+
+    } else {
+
+      showOffline();
+
+    }
+
+  }, 700);
+
+
+  /* ================================================================
+     BADGE CLICK
+  ================================================================ */
+
+  badge.addEventListener(
+    "click",
+    function () {
+
+      const isOpen =
+        widget.classList.contains(
+          "card-open"
+        );
+
+
+      if (isOpen) {
+
+        closeCard();
+
+      } else {
+
+        openCard();
+
+      }
+
+    }
+  );
+
+
+  /* ================================================================
+     CLOSE BUTTON
+  ================================================================ */
+
+  closeButton.addEventListener(
+    "click",
+    function () {
+
+      /*
+       * If offline:
+       * allow manual card close,
+       * but badge remains visible.
+       */
+
+      if (
+        widget.classList.contains(
+          "offline"
+        )
+      ) {
+
+        closeCard();
+
+        return;
+
+      }
+
+
+      /*
+       * Online:
+       * close everything.
+       */
+
+      hideWidget();
+
+    }
+  );
+
+
+  /* ================================================================
+     INTERNET CONNECTED
+  ================================================================ */
+
+  window.addEventListener(
+    "online",
+    function () {
+
+      clearTimeout(hideTimer);
+
+
+      widget.classList.remove(
+        "offline",
+        "checking"
+      );
+
+      widget.classList.add(
+        "online"
+      );
+
+
+      title.textContent =
+        "Back Online";
+
+      subtitle.textContent =
+        "Internet connection restored";
+
+      connection.textContent =
+        "ONLINE";
+
+      network.textContent =
+        "Active";
+
+      footer.textContent =
+        "Connection restored";
+
+
+      /*
+       * Open card immediately.
+       */
+
+      openCard();
+
+
+      /*
+       * After 2 seconds:
+       * hide BOTH card + badge.
+       */
+
+      hideAfterTwoSeconds();
+
+    }
+  );
+
+
+  /* ================================================================
+     INTERNET DISCONNECTED
+  ================================================================ */
+
+  window.addEventListener(
+    "offline",
+    function () {
+
+      clearTimeout(hideTimer);
+
+      showOffline();
+
+    }
+  );
+
+
+  /* ================================================================
+     ESCAPE KEY
+  ================================================================ */
+
+  document.addEventListener(
+    "keydown",
+    function (event) {
+
+      if (
+        event.key === "Escape"
+      ) {
+
+        /*
+         * Don't permanently hide
+         * offline status.
+         */
+
+        if (
+          widget.classList.contains(
+            "offline"
+          )
+        ) {
+
+          closeCard();
+
+        } else {
+
+          hideWidget();
+
+        }
+
+      }
+
+    }
+  );
+
+
+})();

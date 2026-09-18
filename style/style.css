@@ -7062,3 +7062,1212 @@ select:focus-visible {
   }
 
 }
+/* ================================================================
+   FLOATING NETWORK STATUS
+   Murasolimaran Portfolio PWA
+================================================================ */
+
+
+/* ================================================================
+   MAIN WIDGET
+================================================================ */
+
+.network-widget {
+
+  position: fixed;
+
+  /*
+   * Back-to-top button-ku mela position.
+   * Bottom value deliberately increased.
+   */
+  right:
+    max(20px, env(safe-area-inset-right));
+
+  bottom:
+    max(88px, calc(88px + env(safe-area-inset-bottom)));
+
+  z-index: 999990;
+
+  width: auto;
+  height: auto;
+
+  font-family:
+    "Inter",
+    Arial,
+    sans-serif;
+
+  pointer-events: none;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform:
+    translateY(10px);
+
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    transform 0.3s ease;
+
+}
+
+
+/* ================================================================
+   WIDGET VISIBLE
+================================================================ */
+
+.network-widget.widget-visible {
+
+  opacity: 1;
+
+  visibility: visible;
+
+  transform:
+    translateY(0);
+
+}
+
+
+/* ================================================================
+   FLOATING CIRCLE BADGE
+================================================================ */
+
+.network-badge {
+
+  position: relative;
+
+  width: 48px;
+  height: 48px;
+
+  padding: 0;
+
+  border:
+    1px solid
+    rgba(255, 106, 0, 0.32);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 106, 0, 0.10),
+      rgba(10, 11, 15, 0.97) 62%
+    );
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  pointer-events: auto;
+
+  box-shadow:
+
+    0 8px 24px
+    rgba(0, 0, 0, 0.42),
+
+    0 0 18px
+    rgba(255, 106, 0, 0.12),
+
+    inset 0 0 0 1px
+    rgba(255, 255, 255, 0.025);
+
+  backdrop-filter:
+    blur(16px);
+
+  -webkit-backdrop-filter:
+    blur(16px);
+
+  transition:
+
+    transform 0.25s ease,
+
+    box-shadow 0.25s ease,
+
+    border-color 0.25s ease;
+
+}
+
+
+/* ================================================================
+   BADGE HOVER
+================================================================ */
+
+.network-badge:hover {
+
+  transform:
+    translateY(-2px)
+    scale(1.04);
+
+}
+
+
+.network-badge:active {
+
+  transform:
+    scale(0.93);
+
+}
+
+
+/* ================================================================
+   OUTER RING
+================================================================ */
+
+.network-badge-ring {
+
+  position: absolute;
+
+  inset: 5px;
+
+  border-radius: 50%;
+
+  border:
+    1.5px solid
+    rgba(255, 106, 0, 0.85);
+
+  box-shadow:
+
+    0 0 8px
+    rgba(255, 106, 0, 0.20);
+
+  pointer-events: none;
+
+  transition:
+
+    border-color 0.3s ease,
+
+    box-shadow 0.3s ease;
+
+}
+
+
+/* ================================================================
+   NETWORK ICON BASE
+================================================================ */
+
+.network-icon {
+
+  position: relative;
+
+  z-index: 3;
+
+  width: 21px;
+  height: 21px;
+
+  display: none;
+
+  color: #ff6a00;
+
+  filter:
+    drop-shadow(
+      0 0 5px
+      rgba(255, 106, 0, 0.45)
+    );
+
+}
+
+
+/* ================================================================
+   ONLINE
+================================================================ */
+
+.network-widget.online
+.network-icon-online {
+
+  display: block;
+
+}
+
+
+.network-widget.online
+.network-badge {
+
+  border-color:
+    rgba(34, 197, 94, 0.38);
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(34, 197, 94, 0.10),
+      rgba(10, 11, 15, 0.97) 65%
+    );
+
+  box-shadow:
+
+    0 8px 24px
+    rgba(0, 0, 0, 0.42),
+
+    0 0 18px
+    rgba(34, 197, 94, 0.12);
+
+}
+
+
+.network-widget.online
+.network-badge-ring {
+
+  border-color:
+    #22c55e;
+
+  box-shadow:
+
+    0 0 9px
+    rgba(34, 197, 94, 0.30);
+
+}
+
+
+.network-widget.online
+.network-icon {
+
+  color:
+    #22c55e;
+
+  filter:
+    drop-shadow(
+      0 0 5px
+      rgba(34, 197, 94, 0.55)
+    );
+
+}
+
+
+/* ================================================================
+   OFFLINE
+================================================================ */
+
+.network-widget.offline
+.network-icon-offline {
+
+  display: block;
+
+}
+
+
+.network-widget.offline
+.network-badge {
+
+  border-color:
+    rgba(255, 106, 0, 0.50);
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 106, 0, 0.12),
+      rgba(10, 11, 15, 0.97) 65%
+    );
+
+  box-shadow:
+
+    0 8px 24px
+    rgba(0, 0, 0, 0.42),
+
+    0 0 20px
+    rgba(255, 106, 0, 0.15);
+
+}
+
+
+.network-widget.offline
+.network-badge-ring {
+
+  border-color:
+    #ff6a00;
+
+  box-shadow:
+
+    0 0 10px
+    rgba(255, 106, 0, 0.40);
+
+}
+
+
+.network-widget.offline
+.network-icon {
+
+  color:
+    #ff6a00;
+
+  filter:
+    drop-shadow(
+      0 0 6px
+      rgba(255, 106, 0, 0.60)
+    );
+
+}
+
+
+/* ================================================================
+   CHECKING
+================================================================ */
+
+.network-widget.checking
+.network-icon-checking {
+
+  display: block;
+
+  animation:
+    networkChecking
+    1s linear infinite;
+
+}
+
+
+.network-widget.checking
+.network-badge {
+
+  border-color:
+    rgba(96, 165, 250, 0.40);
+
+}
+
+
+.network-widget.checking
+.network-badge-ring {
+
+  border-color:
+    rgba(96, 165, 250, 0.80);
+
+}
+
+
+.network-widget.checking
+.network-icon {
+
+  color:
+    #60a5fa;
+
+  filter:
+    drop-shadow(
+      0 0 6px
+      rgba(96, 165, 250, 0.55)
+    );
+
+}
+
+
+/* ================================================================
+   CHECKING ROTATION
+================================================================ */
+
+@keyframes networkChecking {
+
+  from {
+
+    transform:
+      rotate(0deg);
+
+  }
+
+  to {
+
+    transform:
+      rotate(360deg);
+
+  }
+
+}
+
+
+/* ================================================================
+   NETWORK CARD
+================================================================ */
+
+.network-card {
+
+  position: absolute;
+
+  right: 0;
+
+  /*
+   * Badge 48px + 12px gap
+   */
+  bottom: 60px;
+
+  width: 310px;
+
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background:
+    rgba(9, 11, 15, 0.97);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.10);
+
+  box-shadow:
+
+    0 25px 70px
+    rgba(0, 0, 0, 0.55),
+
+    0 0 35px
+    rgba(0, 0, 0, 0.20);
+
+  backdrop-filter:
+    blur(22px);
+
+  -webkit-backdrop-filter:
+    blur(22px);
+
+  opacity: 0;
+
+  visibility: hidden;
+
+  transform:
+    translateY(12px)
+    scale(0.94);
+
+  transform-origin:
+    bottom right;
+
+  pointer-events: none;
+
+  transition:
+
+    opacity 0.28s ease,
+
+    visibility 0.28s ease,
+
+    transform 0.28s
+    cubic-bezier(
+      0.16,
+      1,
+      0.3,
+      1
+    );
+
+}
+
+
+/* ================================================================
+   CARD OPEN
+================================================================ */
+
+.network-widget.card-open
+.network-card {
+
+  opacity: 1;
+
+  visibility: visible;
+
+  transform:
+    translateY(0)
+    scale(1);
+
+  pointer-events: auto;
+
+}
+
+
+/* ================================================================
+   CARD HEADER
+================================================================ */
+
+.network-card-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 14px;
+
+}
+
+
+.network-card-title-wrap {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  min-width: 0;
+
+}
+
+
+/* ================================================================
+   STATUS ICON CONTAINER
+================================================================ */
+
+.network-status-icon {
+
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+}
+
+
+.network-status-dot {
+
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  background:
+    #999;
+
+}
+
+
+/* ================================================================
+   ONLINE CARD ICON
+================================================================ */
+
+.network-widget.online
+.network-status-icon {
+
+  border-color:
+    rgba(34, 197, 94, 0.25);
+
+  background:
+    rgba(34, 197, 94, 0.08);
+
+}
+
+
+.network-widget.online
+.network-status-dot {
+
+  background:
+    #22c55e;
+
+  box-shadow:
+    0 0 12px
+    rgba(34, 197, 94, 0.80);
+
+}
+
+
+/* ================================================================
+   OFFLINE CARD ICON
+================================================================ */
+
+.network-widget.offline
+.network-status-icon {
+
+  border-color:
+    rgba(255, 106, 0, 0.25);
+
+  background:
+    rgba(255, 106, 0, 0.08);
+
+}
+
+
+.network-widget.offline
+.network-status-dot {
+
+  background:
+    #ff6a00;
+
+  box-shadow:
+    0 0 12px
+    rgba(255, 106, 0, 0.80);
+
+}
+
+
+/* ================================================================
+   CHECKING CARD ICON
+================================================================ */
+
+.network-widget.checking
+.network-status-icon {
+
+  border-color:
+    rgba(96, 165, 250, 0.25);
+
+  background:
+    rgba(96, 165, 250, 0.08);
+
+}
+
+
+.network-widget.checking
+.network-status-dot {
+
+  background:
+    #60a5fa;
+
+  box-shadow:
+    0 0 12px
+    rgba(96, 165, 250, 0.80);
+
+}
+
+
+/* ================================================================
+   CARD TITLE
+================================================================ */
+
+.network-card-title-content {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  min-width: 0;
+
+}
+
+
+.network-card-title-content strong {
+
+  color:
+    #ffffff;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  white-space: nowrap;
+
+}
+
+
+.network-card-title-content span {
+
+  color:
+    rgba(255, 255, 255, 0.52);
+
+  font-size: 10px;
+
+  line-height: 1.35;
+
+}
+
+
+/* ================================================================
+   CLOSE BUTTON
+================================================================ */
+
+.network-close {
+
+  position: relative;
+
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  cursor: pointer;
+
+  transition:
+
+    background 0.2s ease,
+
+    transform 0.2s ease;
+
+}
+
+
+.network-close:hover {
+
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  transform:
+    rotate(90deg);
+
+}
+
+
+.network-close span {
+
+  position: absolute;
+
+  left: 8px;
+  top: 14px;
+
+  width: 14px;
+  height: 1.5px;
+
+  background:
+    rgba(255, 255, 255, 0.70);
+
+  border-radius: 2px;
+
+}
+
+
+.network-close span:first-child {
+
+  transform:
+    rotate(45deg);
+
+}
+
+
+.network-close span:last-child {
+
+  transform:
+    rotate(-45deg);
+
+}
+
+
+/* ================================================================
+   DETAILS
+================================================================ */
+
+.network-details {
+
+  margin-top: 18px;
+
+  padding-top: 15px;
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 11px;
+
+}
+
+
+.network-detail-row {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+}
+
+
+.network-detail-row span {
+
+  color:
+    rgba(255, 255, 255, 0.48);
+
+  font-size: 10px;
+
+}
+
+
+.network-detail-row strong {
+
+  color:
+    #ffffff;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+}
+
+
+/* ================================================================
+   FOOTER
+================================================================ */
+
+.network-card-footer {
+
+  margin-top: 15px;
+
+  padding-top: 13px;
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.06);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color:
+    rgba(255, 255, 255, 0.45);
+
+  font-size: 9px;
+
+}
+
+
+.network-live-dot {
+
+  width: 6px;
+  height: 6px;
+
+  flex: 0 0 6px;
+
+  border-radius: 50%;
+
+  background:
+    #22c55e;
+
+}
+
+
+/* OFFLINE FOOTER */
+
+.network-widget.offline
+.network-live-dot {
+
+  background:
+    #ff6a00;
+
+}
+
+
+/* ================================================================
+   MOBILE
+================================================================ */
+
+@media (max-width: 600px) {
+
+  .network-widget {
+
+    right:
+      max(
+        14px,
+        env(safe-area-inset-right)
+      );
+
+    /*
+     * Back-to-top button-ku mela
+     */
+    bottom:
+      max(
+        76px,
+        calc(
+          76px +
+          env(safe-area-inset-bottom)
+        )
+      );
+
+  }
+
+
+  .network-badge {
+
+    width: 46px;
+
+    height: 46px;
+
+  }
+
+
+  .network-badge-ring {
+
+    inset: 5px;
+
+  }
+
+
+  .network-icon {
+
+    width: 20px;
+
+    height: 20px;
+
+  }
+
+
+  .network-card {
+
+    right: 0;
+
+    bottom: 58px;
+
+    width:
+      min(
+        310px,
+        calc(100vw - 28px)
+      );
+
+    padding: 16px;
+
+    border-radius: 16px;
+
+  }
+
+
+  .network-status-icon {
+
+    width: 40px;
+
+    height: 40px;
+
+    flex-basis: 40px;
+
+  }
+
+
+  .network-card-title-content strong {
+
+    font-size: 13px;
+
+  }
+
+}
+
+
+/* ================================================================
+   VERY SMALL MOBILE
+================================================================ */
+
+@media (max-width: 360px) {
+
+  .network-widget {
+
+    right: 10px;
+
+    bottom:
+      max(
+        72px,
+        calc(
+          72px +
+          env(safe-area-inset-bottom)
+        )
+      );
+
+  }
+
+
+  .network-badge {
+
+    width: 44px;
+
+    height: 44px;
+
+  }
+
+
+  .network-icon {
+
+    width: 19px;
+
+    height: 19px;
+
+  }
+
+
+  .network-card {
+
+    width:
+      calc(100vw - 20px);
+
+    bottom: 56px;
+
+  }
+
+}
+
+
+/* ================================================================
+   TABLET
+================================================================ */
+
+@media (min-width: 601px)
+and (max-width: 1024px) {
+
+  .network-widget {
+
+    right: 22px;
+
+    bottom:
+      max(
+        90px,
+        calc(
+          90px +
+          env(safe-area-inset-bottom)
+        )
+      );
+
+  }
+
+
+  .network-badge {
+
+    width: 48px;
+
+    height: 48px;
+
+  }
+
+
+  .network-card {
+
+    width: 320px;
+
+    bottom: 60px;
+
+  }
+
+}
+
+
+/* ================================================================
+   LARGE DESKTOP
+================================================================ */
+
+@media (min-width: 1440px) {
+
+  .network-widget {
+
+    right: 30px;
+
+    bottom:
+      max(
+        94px,
+        calc(
+          94px +
+          env(safe-area-inset-bottom)
+        )
+      );
+
+  }
+
+
+  .network-badge {
+
+    width: 50px;
+
+    height: 50px;
+
+  }
+
+
+  .network-card {
+
+    width: 330px;
+
+    bottom: 62px;
+
+    padding: 20px;
+
+  }
+
+}
+
+
+/* ================================================================
+   LANDSCAPE MOBILE
+================================================================ */
+
+@media (
+  max-height: 600px
+)
+and (
+  orientation: landscape
+) {
+
+  .network-widget {
+
+    right: 16px;
+
+    bottom: 72px;
+
+  }
+
+
+  .network-badge {
+
+    width: 44px;
+
+    height: 44px;
+
+  }
+
+
+  .network-card {
+
+    bottom: 56px;
+
+    max-height:
+      calc(100dvh - 90px);
+
+    overflow-y: auto;
+
+  }
+
+}
+
+
+/* ================================================================
+   ACCESSIBILITY
+================================================================ */
+
+.network-badge:focus-visible,
+.network-close:focus-visible {
+
+  outline:
+    2px solid
+    #ff6a00;
+
+  outline-offset: 3px;
+
+}
+
+
+/* ================================================================
+   REDUCED MOTION
+================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .network-badge,
+  .network-card,
+  .network-close,
+  .network-badge-ring,
+  .network-icon {
+
+    animation: none !important;
+
+    transition: none !important;
+
+  }
+
+}

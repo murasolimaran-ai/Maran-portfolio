@@ -1272,6 +1272,269 @@ web solutions while working on freelance projects and real-world client solution
   </div>
 
 </div>
+
+<!-- ================================================================
+     NETWORK STATUS FLOATING BADGE
+     Murasolimaran Portfolio PWA
+================================================================ -->
+
+<div
+  id="network-widget"
+  class="network-widget"
+  aria-live="polite"
+  aria-atomic="true"
+>
+
+  <!-- ============================================================
+       FLOATING CIRCLE BADGE
+  ============================================================= -->
+
+  <button
+    id="network-badge"
+    class="network-badge"
+    type="button"
+    aria-label="Network status"
+    aria-expanded="false"
+  >
+
+    <!-- Outer Ring -->
+    <span class="network-badge-ring"></span>
+
+
+    <!-- ==========================================================
+         ONLINE ICON — WiFi
+    ========================================================== -->
+
+    <svg
+      class="network-icon network-icon-online"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+
+      <path
+        d="M2.5 9.5C7.75 4.25 16.25 4.25 21.5 9.5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M5.5 12.5C9.1 8.9 14.9 8.9 18.5 12.5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M8.7 15.6C10.55 13.75 13.45 13.75 15.3 15.6"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <circle
+        cx="12"
+        cy="19"
+        r="1.3"
+        fill="currentColor"
+      />
+
+    </svg>
+
+
+    <!-- ==========================================================
+         OFFLINE ICON — WiFi Off
+    ========================================================== -->
+
+    <svg
+      class="network-icon network-icon-offline"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+
+      <path
+        d="M2.5 9.5C7.75 4.25 16.25 4.25 21.5 9.5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M5.5 12.5C9.1 8.9 14.9 8.9 18.5 12.5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M8.7 15.6C10.55 13.75 13.45 13.75 15.3 15.6"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <circle
+        cx="12"
+        cy="19"
+        r="1.3"
+        fill="currentColor"
+      />
+
+      <!-- Diagonal Slash -->
+      <path
+        d="M4 4L20 20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+      />
+
+    </svg>
+
+
+    <!-- ==========================================================
+         CHECKING ICON
+    ========================================================== -->
+
+    <svg
+      class="network-icon network-icon-checking"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+
+      <circle
+        cx="12"
+        cy="12"
+        r="8.5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-dasharray="20 34"
+        stroke-linecap="round"
+      />
+
+    </svg>
+
+  </button>
+
+
+  <!-- ============================================================
+       NETWORK DETAILS CARD
+  ============================================================= -->
+
+  <div
+    id="network-card"
+    class="network-card"
+    role="status"
+  >
+
+    <!-- ==========================================================
+         CARD HEADER
+    ========================================================== -->
+
+    <div class="network-card-header">
+
+      <div class="network-card-title-wrap">
+
+        <!-- Status Icon -->
+        <div class="network-status-icon">
+
+          <span class="network-status-dot"></span>
+
+        </div>
+
+
+        <!-- Title -->
+        <div class="network-card-title-content">
+
+          <strong id="network-title">
+            You're Online
+          </strong>
+
+          <span id="network-subtitle">
+            Internet connection available
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Close Button -->
+      <button
+        id="network-close"
+        class="network-close"
+        type="button"
+        aria-label="Close network status"
+      >
+
+        <span></span>
+        <span></span>
+
+      </button>
+
+    </div>
+
+
+    <!-- ==========================================================
+         CONNECTION DETAILS
+    ========================================================== -->
+
+    <div class="network-details">
+
+      <div class="network-detail-row">
+
+        <span>
+          Connection
+        </span>
+
+        <strong id="network-connection">
+          ONLINE
+        </strong>
+
+      </div>
+
+
+      <div class="network-detail-row">
+
+        <span>
+          Network
+        </span>
+
+        <strong id="network-network">
+          Active
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- ==========================================================
+         CARD FOOTER
+    ========================================================== -->
+
+    <div class="network-card-footer">
+
+      <span class="network-live-dot"></span>
+
+      <span id="network-footer">
+        All features available
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
 <script>
 /* =========================================
    SERVICE WORKER REGISTRATION
