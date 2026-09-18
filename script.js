@@ -1031,6 +1031,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 (function () {
 
+  /* ================================================================
+     ELEMENTS
+  ================================================================ */
+
   const widget =
     document.getElementById("network-widget");
 
@@ -1056,34 +1060,55 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("network-footer");
 
 
+  /* ================================================================
+     SAFETY CHECK
+  ================================================================ */
+
   if (
     !widget ||
     !badge ||
-    !closeButton
+    !closeButton ||
+    !title ||
+    !subtitle ||
+    !connection ||
+    !network ||
+    !footer
   ) {
     return;
   }
 
 
+  /* ================================================================
+     TIMER
+  ================================================================ */
+
   let hideTimer = null;
 
 
   /* ================================================================
-     SHOW WIDGET
+     SHOW ENTIRE WIDGET
   ================================================================ */
 
   function showWidget() {
 
-    widget.classList.add("widget-visible");
+    widget.classList.add(
+      "widget-visible"
+    );
 
   }
 
 
   /* ================================================================
      HIDE ENTIRE WIDGET
+     
+     Used for:
+     ONLINE → 2 sec → hide
+     BACK ONLINE → 2 sec → hide
   ================================================================ */
 
   function hideWidget() {
+
+    clearTimeout(hideTimer);
 
     widget.classList.remove(
       "widget-visible",
@@ -1104,6 +1129,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openCard() {
 
+    clearTimeout(hideTimer);
+
     widget.classList.add(
       "widget-visible",
       "card-open"
@@ -1119,6 +1146,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================================================================
      CLOSE CARD ONLY
+     
+     Badge remains visible.
   ================================================================ */
 
   function closeCard() {
@@ -1136,27 +1165,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* ================================================================
-     AUTO HIDE
+     HIDE ENTIRE WIDGET AFTER DELAY
   ================================================================ */
 
-  function hideAfterTwoSeconds() {
+  function hideAfter(delay) {
 
     clearTimeout(hideTimer);
 
-    hideTimer = setTimeout(() => {
+    hideTimer = setTimeout(
+      function () {
 
-      hideWidget();
+        hideWidget();
 
-    }, 2000);
+      },
+      delay
+    );
 
   }
 
 
   /* ================================================================
-     ONLINE UI
+     ONLINE STATE
+     
+     Card + badge visible for 2 seconds.
+     Then BOTH disappear.
   ================================================================ */
 
   function showOnline() {
+
+    clearTimeout(hideTimer);
+
 
     widget.classList.remove(
       "offline",
@@ -1184,25 +1222,24 @@ document.addEventListener("DOMContentLoaded", () => {
       "All features available";
 
 
-    /*
-     * Show card + badge
-     */
+    /* Show card + badge */
 
     openCard();
 
 
-    /*
-     * IMPORTANT:
-     * Entire widget disappears after 2 seconds.
-     */
+    /* Hide BOTH after 2 seconds */
 
-    hideAfterTwoSeconds();
+    hideAfter(2000);
 
   }
 
 
   /* ================================================================
-     OFFLINE UI
+     OFFLINE STATE
+     
+     Card + badge visible initially.
+     Card closes after 5 seconds.
+     Badge stays visible.
   ================================================================ */
 
   function showOffline() {
@@ -1236,21 +1273,38 @@ document.addEventListener("DOMContentLoaded", () => {
       "Waiting for internet connection";
 
 
-    /*
-     * IMPORTANT:
-     * Offline card NEVER auto closes.
-     */
+    /* Show card + badge */
 
     openCard();
+
+
+    /*
+     * After 5 seconds:
+     *
+     * CARD closes
+     * BADGE stays
+     */
+
+    hideTimer = setTimeout(
+      function () {
+
+        closeCard();
+
+      },
+      5000
+    );
 
   }
 
 
   /* ================================================================
-     CHECKING
+     CHECKING STATE
   ================================================================ */
 
   function showChecking() {
+
+    clearTimeout(hideTimer);
+
 
     widget.classList.remove(
       "online",
@@ -1290,23 +1344,40 @@ document.addEventListener("DOMContentLoaded", () => {
   showChecking();
 
 
-  setTimeout(() => {
+  setTimeout(
+    function () {
 
-    if (navigator.onLine) {
+      if (navigator.onLine) {
 
-      showOnline();
+        /*
+         * Internet available
+         *
+         * Show Online for 2 sec
+         */
 
-    } else {
+        showOnline();
 
-      showOffline();
+      } else {
 
-    }
+        /*
+         * Internet unavailable
+         *
+         * Show Offline card for 5 sec
+         */
 
-  }, 700);
+        showOffline();
+
+      }
+
+    },
+    700
+  );
 
 
   /* ================================================================
      BADGE CLICK
+     
+     User can manually open/close the card.
   ================================================================ */
 
   badge.addEventListener(
@@ -1321,11 +1392,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (isOpen) {
 
+        /*
+         * Card already open
+         * → close card only
+         */
+
         closeCard();
 
       } else {
 
+        /*
+         * Card closed
+         * → open card
+         */
+
         openCard();
+
+
+        /*
+         * If currently offline,
+         * don't auto-close after clicking.
+         *
+         * User controls it manually.
+         */
+
+        if (
+          widget.classList.contains(
+            "offline"
+          )
+        ) {
+
+          clearTimeout(hideTimer);
+
+        }
 
       }
 
@@ -1342,9 +1441,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function () {
 
       /*
-       * If offline:
-       * allow manual card close,
-       * but badge remains visible.
+       * Offline:
+       * close CARD only.
+       * Badge remains.
        */
 
       if (
@@ -1352,6 +1451,8 @@ document.addEventListener("DOMContentLoaded", () => {
           "offline"
         )
       ) {
+
+        clearTimeout(hideTimer);
 
         closeCard();
 
@@ -1361,7 +1462,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       /*
-       * Online:
+       * Online / Checking:
        * close everything.
        */
 
@@ -1372,7 +1473,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* ================================================================
-     INTERNET CONNECTED
+     INTERNET CONNECTION RESTORED
+     
+     Offline → Online
+     
+     Show "Back Online"
+     for 2 seconds.
+     
+     Then hide badge + card.
   ================================================================ */
 
   window.addEventListener(
@@ -1409,25 +1517,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
       /*
-       * Open card immediately.
+       * Show card + badge
        */
 
       openCard();
 
 
       /*
-       * After 2 seconds:
-       * hide BOTH card + badge.
+       * Hide BOTH after 2 seconds
        */
 
-      hideAfterTwoSeconds();
+      hideAfter(2000);
 
     }
   );
 
 
   /* ================================================================
-     INTERNET DISCONNECTED
+     INTERNET CONNECTION LOST
+     
+     Online → Offline
+     
+     Show offline card.
+     After 5 seconds card closes.
+     Badge stays.
   ================================================================ */
 
   window.addEventListener(
@@ -1451,29 +1564,39 @@ document.addEventListener("DOMContentLoaded", () => {
     function (event) {
 
       if (
-        event.key === "Escape"
+        event.key !== "Escape"
+      ) {
+        return;
+      }
+
+
+      /*
+       * Offline:
+       * ESC closes card only.
+       * Badge remains.
+       */
+
+      if (
+        widget.classList.contains(
+          "offline"
+        )
       ) {
 
-        /*
-         * Don't permanently hide
-         * offline status.
-         */
+        clearTimeout(hideTimer);
 
-        if (
-          widget.classList.contains(
-            "offline"
-          )
-        ) {
+        closeCard();
 
-          closeCard();
-
-        } else {
-
-          hideWidget();
-
-        }
+        return;
 
       }
+
+
+      /*
+       * Online / Checking:
+       * hide everything.
+       */
+
+      hideWidget();
 
     }
   );
