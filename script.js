@@ -1666,7 +1666,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 })();
 /* ================================================================
-   PWA SERVICE WORKER + UPDATE PROMPT
+   PWA SERVICE WORKER + FAST UPDATE PROMPT
 ================================================================ */
 
 if ("serviceWorker" in navigator) {
@@ -1681,23 +1681,76 @@ if ("serviceWorker" in navigator) {
           { scope: "/" }
         );
 
+
+      /* ============================================================
+         PWA INSTALL DETECTION
+      ============================================================ */
+
+      function isInstalledPWA() {
+
+        /* Android / Chrome / Edge PWA */
+        if (
+          window.matchMedia(
+            "(display-mode: standalone)"
+          ).matches
+        ) {
+          return true;
+        }
+
+        /* iPhone / iPad PWA */
+        if (
+          window.navigator.standalone === true
+        ) {
+          return true;
+        }
+
+        /* Android installed app */
+        if (
+          document.referrer.startsWith(
+            "android-app://"
+          )
+        ) {
+          return true;
+        }
+
+        return false;
+      }
+
+
+      /* ============================================================
+         UPDATE ELEMENTS
+      ============================================================ */
+
       const updatePrompt =
-        document.getElementById("pwa-update-prompt");
+        document.getElementById(
+          "pwa-update-prompt"
+        );
 
       const refreshButton =
-        document.getElementById("pwa-refresh-btn");
+        document.getElementById(
+          "pwa-refresh-btn"
+        );
 
       const closeButton =
-        document.getElementById("pwa-update-close");
+        document.getElementById(
+          "pwa-update-close"
+        );
 
       const updateIcon =
-        document.querySelector(".pwa-update-icon");
+        document.querySelector(
+          ".pwa-update-icon"
+        );
 
       const updateTitle =
-        updatePrompt?.querySelector(".pwa-update-text strong");
+        updatePrompt?.querySelector(
+          ".pwa-update-text strong"
+        );
 
       const updateText =
-        updatePrompt?.querySelector(".pwa-update-text span");
+        updatePrompt?.querySelector(
+          ".pwa-update-text span"
+        );
+
 
       let refreshing = false;
 
@@ -1707,6 +1760,35 @@ if ("serviceWorker" in navigator) {
       ============================================================ */
 
       function showUpdatePrompt() {
+
+        if (!isInstalledPWA()) return;
+
+        updatePrompt?.classList.remove(
+          "update-success"
+        );
+
+        updatePrompt?.classList.remove(
+          "updating"
+        );
+
+        if (updateIcon) {
+          updateIcon.innerHTML = "↻";
+        }
+
+        if (updateTitle) {
+          updateTitle.textContent =
+            "New version available";
+        }
+
+        if (updateText) {
+          updateText.textContent =
+            "Refresh to get the latest version.";
+        }
+
+        if (refreshButton) {
+          refreshButton.disabled = false;
+          refreshButton.innerHTML = "Refresh";
+        }
 
         updatePrompt?.classList.add("show");
 
@@ -1719,58 +1801,86 @@ if ("serviceWorker" in navigator) {
 
       function hideUpdatePrompt() {
 
-        updatePrompt?.classList.remove("show");
+        updatePrompt?.classList.remove(
+          "show",
+          "updating",
+          "update-success"
+        );
 
       }
 
 
       /* ============================================================
-         UPDATE UI
+         UPDATING STATE
       ============================================================ */
 
       function setUpdatingState() {
 
-        updatePrompt?.classList.add("updating");
+        updatePrompt?.classList.remove(
+          "update-success"
+        );
+
+        updatePrompt?.classList.add(
+          "show",
+          "updating"
+        );
+
+        if (updateIcon) {
+          updateIcon.innerHTML = "↻";
+        }
 
         if (updateTitle) {
-          updateTitle.textContent = "Updating portfolio";
+          updateTitle.textContent =
+            "Updating portfolio";
         }
 
         if (updateText) {
-          updateText.textContent = "Please wait...";
+          updateText.textContent =
+            "Installing the latest version...";
         }
 
         if (refreshButton) {
           refreshButton.disabled = true;
-          refreshButton.innerHTML = "Updating...";
+          refreshButton.innerHTML =
+            "Updating...";
         }
 
       }
 
 
       /* ============================================================
-         SUCCESS UI
+         SUCCESS STATE
       ============================================================ */
 
       function setSuccessState() {
 
-        updatePrompt?.classList.remove("updating");
-        updatePrompt?.classList.add("update-success");
+        updatePrompt?.classList.remove(
+          "updating"
+        );
+
+        updatePrompt?.classList.add(
+          "show",
+          "update-success"
+        );
 
         if (updateIcon) {
           updateIcon.innerHTML = "✓";
         }
 
         if (updateTitle) {
-          updateTitle.textContent = "Updated successfully";
+          updateTitle.textContent =
+            "Updated successfully";
         }
 
         if (updateText) {
-          updateText.textContent = "Latest version is ready.";
+          updateText.textContent =
+            "Latest version is ready.";
         }
 
         if (refreshButton) {
-          refreshButton.innerHTML = "Done";
+          refreshButton.disabled = true;
+          refreshButton.innerHTML =
+            "Done";
         }
 
       }
@@ -1782,6 +1892,9 @@ if ("serviceWorker" in navigator) {
 
       function checkForUpdate() {
 
+        /* Only installed PWA */
+        if (!isInstalledPWA()) return;
+
         if (registration.waiting) {
 
           showUpdatePrompt();
@@ -1789,6 +1902,7 @@ if ("serviceWorker" in navigator) {
         }
 
       }
+
 
       checkForUpdate();
 
@@ -1813,7 +1927,8 @@ if ("serviceWorker" in navigator) {
 
               if (
                 newWorker.state === "installed" &&
-                navigator.serviceWorker.controller
+                navigator.serviceWorker.controller &&
+                isInstalledPWA()
               ) {
 
                 showUpdatePrompt();
@@ -1845,7 +1960,8 @@ if ("serviceWorker" in navigator) {
           try {
 
             /* ------------------------------------------------------
-               Existing waiting worker
+               FAST PATH:
+               New Service Worker already downloaded
             ------------------------------------------------------ */
 
             if (registration.waiting) {
@@ -1859,11 +1975,15 @@ if ("serviceWorker" in navigator) {
 
 
             /* ------------------------------------------------------
-               Check for new version
+               Ask browser to check for new version
             ------------------------------------------------------ */
 
             await registration.update();
 
+
+            /* ------------------------------------------------------
+               New worker found
+            ------------------------------------------------------ */
 
             if (registration.waiting) {
 
@@ -1871,21 +1991,23 @@ if ("serviceWorker" in navigator) {
                 type: "SKIP_WAITING"
               });
 
-            } else {
-
-              /* No SW update — still show success */
-
-              setSuccessState();
-
-              setTimeout(() => {
-
-                hideUpdatePrompt();
-
-                window.location.reload();
-
-              }, 1000);
-
+              return;
             }
+
+
+            /* ------------------------------------------------------
+               No new Service Worker
+            ------------------------------------------------------ */
+
+            setSuccessState();
+
+            setTimeout(() => {
+
+              hideUpdatePrompt();
+
+              window.location.reload();
+
+            }, 1000);
 
           } catch (error) {
 
@@ -1896,8 +2018,17 @@ if ("serviceWorker" in navigator) {
 
             refreshing = false;
 
+            updatePrompt?.classList.remove(
+              "updating"
+            );
+
+            if (updateIcon) {
+              updateIcon.innerHTML = "!";
+            }
+
             if (updateTitle) {
-              updateTitle.textContent = "Update failed";
+              updateTitle.textContent =
+                "Update failed";
             }
 
             if (updateText) {
@@ -1907,7 +2038,8 @@ if ("serviceWorker" in navigator) {
 
             if (refreshButton) {
               refreshButton.disabled = false;
-              refreshButton.innerHTML = "Retry";
+              refreshButton.innerHTML =
+                "Retry";
             }
 
           }
@@ -1942,13 +2074,11 @@ if ("serviceWorker" in navigator) {
 
           if (!refreshing) return;
 
+          /* Show success immediately */
           setSuccessState();
 
 
-          /* --------------------------------------------------------
-             Show success for 1 second
-          -------------------------------------------------------- */
-
+          /* Keep success message for 1 second */
           setTimeout(() => {
 
             hideUpdatePrompt();
@@ -1962,7 +2092,7 @@ if ("serviceWorker" in navigator) {
 
 
       /* ============================================================
-         CHECK UPDATE WHEN USER RETURNS
+         FAST UPDATE CHECK WHEN PWA RETURNS
       ============================================================ */
 
       document.addEventListener(
@@ -1970,7 +2100,9 @@ if ("serviceWorker" in navigator) {
         () => {
 
           if (
-            document.visibilityState === "visible"
+            document.visibilityState ===
+              "visible" &&
+            isInstalledPWA()
           ) {
 
             registration.update();
@@ -1979,6 +2111,24 @@ if ("serviceWorker" in navigator) {
 
         }
       );
+
+
+      /* ============================================================
+         EXTRA UPDATE CHECK
+         Check when PWA becomes active again
+      ============================================================ */
+
+      window.addEventListener(
+        "pageshow",
+        () => {
+
+          if (!isInstalledPWA()) return;
+
+          registration.update();
+
+        }
+      );
+
 
     } catch (error) {
 
