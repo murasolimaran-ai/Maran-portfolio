@@ -324,10 +324,9 @@ if (typingEl) {
   const roles = [
     "AI Engineer",
     "Machine Learning Engineer",
-    "Data Scientist",
-    "Python Developer",
-    "Full Stack Developer",
-    "Creative Technologist"
+    "Python Full Stack Developer",
+    "Generative AI Engineer",
+    "AI & Web Solutions Freelancer"
   ];
   let rIdx = 0, cIdx = 0, deleting = false;
 
@@ -1604,3 +1603,212 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 })();
+/* ================================================================
+   PWA SERVICE WORKER + UPDATE SYSTEM
+================================================================ */
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener("load", async () => {
+
+    try {
+
+      const registration =
+        await navigator.serviceWorker.register(
+          "/service-worker.js",
+          {
+            scope: "/"
+          }
+        );
+
+
+      console.log(
+        "PWA Service Worker registered:",
+        registration.scope
+      );
+
+
+      /* ============================================================
+         UPDATE PROMPT ELEMENTS
+      ============================================================ */
+
+      const updatePrompt =
+        document.getElementById(
+          "pwa-update-prompt"
+        );
+
+      const refreshButton =
+        document.getElementById(
+          "pwa-refresh-btn"
+        );
+
+      const closeButton =
+        document.getElementById(
+          "pwa-update-close"
+        );
+
+
+      let refreshing = false;
+
+
+      /* ============================================================
+         SHOW UPDATE PROMPT
+      ============================================================ */
+
+      function showUpdatePrompt() {
+
+        if (!updatePrompt) return;
+
+        updatePrompt.classList.add("show");
+
+      }
+
+
+      /* ============================================================
+         CHECK IF UPDATE IS WAITING
+      ============================================================ */
+
+      function checkWaitingWorker() {
+
+        if (registration.waiting) {
+
+          showUpdatePrompt();
+
+        }
+
+      }
+
+
+      checkWaitingWorker();
+
+
+      /* ============================================================
+         NEW SERVICE WORKER FOUND
+      ============================================================ */
+
+      registration.addEventListener(
+        "updatefound",
+        () => {
+
+          const newWorker =
+            registration.installing;
+
+          if (!newWorker) return;
+
+
+          newWorker.addEventListener(
+            "statechange",
+            () => {
+
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+
+                showUpdatePrompt();
+
+              }
+
+            }
+          );
+
+        }
+      );
+
+
+      /* ============================================================
+         REFRESH BUTTON
+      ============================================================ */
+
+      refreshButton?.addEventListener(
+        "click",
+        () => {
+
+          const waitingWorker =
+            registration.waiting;
+
+
+          if (!waitingWorker) {
+
+            window.location.reload();
+
+            return;
+
+          }
+
+
+          waitingWorker.postMessage({
+            type: "SKIP_WAITING"
+          });
+
+        }
+      );
+
+
+      /* ============================================================
+         CLOSE BUTTON
+      ============================================================ */
+
+      closeButton?.addEventListener(
+        "click",
+        () => {
+
+          updatePrompt?.classList.remove(
+            "show"
+          );
+
+        }
+      );
+
+
+      /* ============================================================
+         NEW SERVICE WORKER CONTROLS PAGE
+      ============================================================ */
+
+      navigator.serviceWorker.addEventListener(
+        "controllerchange",
+        () => {
+
+          if (refreshing) return;
+
+          refreshing = true;
+
+          window.location.reload();
+
+        }
+      );
+
+
+      /* ============================================================
+         CHECK FOR NEW VERSION WHEN USER RETURNS
+      ============================================================ */
+
+      document.addEventListener(
+        "visibilitychange",
+        () => {
+
+          if (
+            document.visibilityState ===
+            "visible"
+          ) {
+
+            registration.update();
+
+          }
+
+        }
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Service Worker registration failed:",
+        error
+      );
+
+    }
+
+  });
+
+}
