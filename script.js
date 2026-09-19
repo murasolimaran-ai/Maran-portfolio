@@ -122,49 +122,111 @@ function showToast(message, type) {
 }
 
 /* ================================================================
-   3. NAVBAR SLIM + BACK TO TOP + ACTIVE NAV LINK
-================================================================ */
-const navbar   = document.getElementById("navbar");
-const bttBtn   = document.getElementById("btt");
-const sections = document.querySelectorAll("section[id]");
-const navLinks = document.querySelectorAll(".nav-links a");
-
-window.addEventListener("scroll", function () {
-
-  /* Slim navbar after 60px */
-  if (navbar) navbar.classList.toggle("slim", window.scrollY > 60);
-
-  /* Show / hide back-to-top button */
-  if (bttBtn) bttBtn.classList.toggle("show", window.scrollY > 400);
-
-  /* Highlight active nav link */
-  let cur = "";
-  sections.forEach(function (s) {
-    if (window.scrollY >= s.offsetTop - 130) cur = s.id;
-  });
-  navLinks.forEach(function (a) {
-    a.classList.toggle("active", a.getAttribute("href") === "#" + cur);
-  });
-
-}, { passive: true });
-
-/* ================================================================
    4. HAMBURGER MOBILE MENU
 ================================================================ */
+
 const burger = document.getElementById("burger");
 const mobNav = document.getElementById("mobNav");
 
 if (burger && mobNav) {
-  burger.addEventListener("click", function () {
+
+  /* ============================================================
+     OPEN / CLOSE MENU - HAMBURGER
+  ============================================================ */
+
+  burger.addEventListener("click", function (event) {
+
+    event.stopPropagation();
+
     burger.classList.toggle("open");
     mobNav.classList.toggle("open");
+
   });
+
+
+  /* ============================================================
+     CLOSE MENU - NAV LINK CLICK
+  ============================================================ */
+
   mobNav.querySelectorAll("a").forEach(function (a) {
+
     a.addEventListener("click", function () {
+
       burger.classList.remove("open");
       mobNav.classList.remove("open");
+
     });
+
   });
+
+
+  /* ============================================================
+     CLOSE MENU - CLICK OUTSIDE
+  ============================================================ */
+
+  document.addEventListener("click", function (event) {
+
+    if (!mobNav.classList.contains("open")) return;
+
+    const clickedInsideMenu = mobNav.contains(event.target);
+    const clickedBurger = burger.contains(event.target);
+
+    if (!clickedInsideMenu && !clickedBurger) {
+
+      burger.classList.remove("open");
+      mobNav.classList.remove("open");
+
+    }
+
+  });
+
+
+  /* ============================================================
+     CLOSE MENU - START SCROLLING
+  ============================================================ */
+
+  let scrollStartY = 0;
+
+  window.addEventListener("touchstart", function () {
+
+    if (!mobNav.classList.contains("open")) return;
+
+    scrollStartY = window.scrollY;
+
+  }, { passive: true });
+
+
+  window.addEventListener("touchmove", function () {
+
+    if (!mobNav.classList.contains("open")) return;
+
+    if (Math.abs(window.scrollY - scrollStartY) > 5) {
+
+      burger.classList.remove("open");
+      mobNav.classList.remove("open");
+
+    }
+
+  }, { passive: true });
+
+
+  /* ============================================================
+     CLOSE MENU - NORMAL PAGE SCROLL
+  ============================================================ */
+
+  window.addEventListener("scroll", function () {
+
+    if (!mobNav.classList.contains("open")) return;
+
+    if (window.scrollY !== scrollStartY) {
+
+      burger.classList.remove("open");
+      mobNav.classList.remove("open");
+
+    }
+
+  }, { passive: true });
+
 }
 
 /* ================================================================
