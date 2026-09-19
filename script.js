@@ -1666,7 +1666,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 })();
 /* ================================================================
-   PWA SERVICE WORKER + UPDATE SYSTEM
+   PWA SERVICE WORKER + UPDATE PROMPT
 ================================================================ */
 
 if ("serviceWorker" in navigator) {
@@ -1678,37 +1678,26 @@ if ("serviceWorker" in navigator) {
       const registration =
         await navigator.serviceWorker.register(
           "/service-worker.js",
-          {
-            scope: "/"
-          }
+          { scope: "/" }
         );
-
-
-      console.log(
-        "PWA Service Worker registered:",
-        registration.scope
-      );
-
-
-      /* ============================================================
-         UPDATE PROMPT ELEMENTS
-      ============================================================ */
 
       const updatePrompt =
-        document.getElementById(
-          "pwa-update-prompt"
-        );
+        document.getElementById("pwa-update-prompt");
 
       const refreshButton =
-        document.getElementById(
-          "pwa-refresh-btn"
-        );
+        document.getElementById("pwa-refresh-btn");
 
       const closeButton =
-        document.getElementById(
-          "pwa-update-close"
-        );
+        document.getElementById("pwa-update-close");
 
+      const updateIcon =
+        document.querySelector(".pwa-update-icon");
+
+      const updateTitle =
+        updatePrompt?.querySelector(".pwa-update-text strong");
+
+      const updateText =
+        updatePrompt?.querySelector(".pwa-update-text span");
 
       let refreshing = false;
 
@@ -1719,18 +1708,79 @@ if ("serviceWorker" in navigator) {
 
       function showUpdatePrompt() {
 
-        if (!updatePrompt) return;
-
-        updatePrompt.classList.add("show");
+        updatePrompt?.classList.add("show");
 
       }
 
 
       /* ============================================================
-         CHECK IF UPDATE IS WAITING
+         HIDE UPDATE PROMPT
       ============================================================ */
 
-      function checkWaitingWorker() {
+      function hideUpdatePrompt() {
+
+        updatePrompt?.classList.remove("show");
+
+      }
+
+
+      /* ============================================================
+         UPDATE UI
+      ============================================================ */
+
+      function setUpdatingState() {
+
+        updatePrompt?.classList.add("updating");
+
+        if (updateTitle) {
+          updateTitle.textContent = "Updating portfolio";
+        }
+
+        if (updateText) {
+          updateText.textContent = "Please wait...";
+        }
+
+        if (refreshButton) {
+          refreshButton.disabled = true;
+          refreshButton.innerHTML = "Updating...";
+        }
+
+      }
+
+
+      /* ============================================================
+         SUCCESS UI
+      ============================================================ */
+
+      function setSuccessState() {
+
+        updatePrompt?.classList.remove("updating");
+        updatePrompt?.classList.add("update-success");
+
+        if (updateIcon) {
+          updateIcon.innerHTML = "✓";
+        }
+
+        if (updateTitle) {
+          updateTitle.textContent = "Updated successfully";
+        }
+
+        if (updateText) {
+          updateText.textContent = "Latest version is ready.";
+        }
+
+        if (refreshButton) {
+          refreshButton.innerHTML = "Done";
+        }
+
+      }
+
+
+      /* ============================================================
+         CHECK WAITING SERVICE WORKER
+      ============================================================ */
+
+      function checkForUpdate() {
 
         if (registration.waiting) {
 
@@ -1740,8 +1790,7 @@ if ("serviceWorker" in navigator) {
 
       }
 
-
-      checkWaitingWorker();
+      checkForUpdate();
 
 
       /* ============================================================
@@ -1779,29 +1828,89 @@ if ("serviceWorker" in navigator) {
 
 
       /* ============================================================
-         REFRESH BUTTON
+         REFRESH / UPDATE BUTTON
       ============================================================ */
 
       refreshButton?.addEventListener(
         "click",
-        () => {
+        async () => {
 
-          const waitingWorker =
-            registration.waiting;
+          if (refreshing) return;
+
+          refreshing = true;
+
+          setUpdatingState();
 
 
-          if (!waitingWorker) {
+          try {
 
-            window.location.reload();
+            /* ------------------------------------------------------
+               Existing waiting worker
+            ------------------------------------------------------ */
 
-            return;
+            if (registration.waiting) {
+
+              registration.waiting.postMessage({
+                type: "SKIP_WAITING"
+              });
+
+              return;
+            }
+
+
+            /* ------------------------------------------------------
+               Check for new version
+            ------------------------------------------------------ */
+
+            await registration.update();
+
+
+            if (registration.waiting) {
+
+              registration.waiting.postMessage({
+                type: "SKIP_WAITING"
+              });
+
+            } else {
+
+              /* No SW update — still show success */
+
+              setSuccessState();
+
+              setTimeout(() => {
+
+                hideUpdatePrompt();
+
+                window.location.reload();
+
+              }, 1000);
+
+            }
+
+          } catch (error) {
+
+            console.error(
+              "PWA update failed:",
+              error
+            );
+
+            refreshing = false;
+
+            if (updateTitle) {
+              updateTitle.textContent = "Update failed";
+            }
+
+            if (updateText) {
+              updateText.textContent =
+                "Please try again.";
+            }
+
+            if (refreshButton) {
+              refreshButton.disabled = false;
+              refreshButton.innerHTML = "Retry";
+            }
 
           }
-
-
-          waitingWorker.postMessage({
-            type: "SKIP_WAITING"
-          });
 
         }
       );
@@ -1815,34 +1924,45 @@ if ("serviceWorker" in navigator) {
         "click",
         () => {
 
-          updatePrompt?.classList.remove(
-            "show"
-          );
+          if (refreshing) return;
+
+          hideUpdatePrompt();
 
         }
       );
 
 
       /* ============================================================
-         NEW SERVICE WORKER CONTROLS PAGE
+         NEW SERVICE WORKER ACTIVATED
       ============================================================ */
 
       navigator.serviceWorker.addEventListener(
         "controllerchange",
         () => {
 
-          if (refreshing) return;
+          if (!refreshing) return;
 
-          refreshing = true;
+          setSuccessState();
 
-          window.location.reload();
+
+          /* --------------------------------------------------------
+             Show success for 1 second
+          -------------------------------------------------------- */
+
+          setTimeout(() => {
+
+            hideUpdatePrompt();
+
+            window.location.reload();
+
+          }, 1000);
 
         }
       );
 
 
       /* ============================================================
-         CHECK FOR NEW VERSION WHEN USER RETURNS
+         CHECK UPDATE WHEN USER RETURNS
       ============================================================ */
 
       document.addEventListener(
@@ -1850,8 +1970,7 @@ if ("serviceWorker" in navigator) {
         () => {
 
           if (
-            document.visibilityState ===
-            "visible"
+            document.visibilityState === "visible"
           ) {
 
             registration.update();
@@ -1860,7 +1979,6 @@ if ("serviceWorker" in navigator) {
 
         }
       );
-
 
     } catch (error) {
 
